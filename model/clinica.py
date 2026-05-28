@@ -13,6 +13,52 @@ Com base no diagrama do model, basta escrever as classes nesta pasta model
 
 class Clinica:
     def __init__(self, nome, endereco, horario_abertura, horario_fechamento):
-        pass
+        self.__nome = nome
+        self.__endereco = endereco
+        self.__horario_abertura = horario_abertura
+        self.__horario_fechamento = horario_fechamento
 
-    # abaixo vão os métodos;
+    @property
+    def nome(self):
+        return self.__nome
+    
+    @property
+    def endereco(self):
+        return self.__endereco
+    
+    @property
+    def horario_abertura(self):
+        return self.__horario_abertura
+
+    @property
+    def horario_fechamento(self):
+        return self.__horario_fechamento
+
+    @nome.setter
+    def nome(self, nome):
+        self.__nome = nome
+
+    @endereco.setter
+    def endereco(self, endereco):
+        self.__endereco = endereco
+
+    @horario_abertura.setter
+    def horario_abertura(self, horario_abertura):
+        self.__horario_abertura = horario_abertura
+
+    @horario_fechamento.setter
+    def horario_fechamento(self, horario_fechamento):
+        self.__horario_fechamento = horario_fechamento
+
+    # métodos;
+    def esta_aberta(self, horario_atual) -> bool:
+        if self.__horario_abertura <= horario_atual < self.__horario_fechamento:
+            return True
+        else:
+            return False
+        
+    def validar_horario_atendimento(self, horario_inicio, horario_fim) -> bool:
+        if self.esta_aberta(horario_inicio) and self.esta_aberta(horario_fim) and horario_inicio < horario_fim:
+            return True
+        else:
+            return False
