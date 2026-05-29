@@ -4,11 +4,12 @@
 
 
 """
-from paciente import Paciente
-from profissional import Profissional
-from procedimento import Procedimento
-from tipo_atendimento import TipoAtendimento
-from pagamento import Pagamento
+#from clinica.model import procedimento
+from model.paciente import Paciente
+from model.profissional import Profissional
+from model.procedimento import Procedimento
+from model.tipo_atendimento import TipoAtendimento
+from model.pagamento import Pagamento
 
 class Atendimento:
     def __init__(self, data, horario_inicio, horario_fim, valor):
@@ -65,9 +66,11 @@ class Atendimento:
             return False
         
     def adicionar_procedimento(self, procedimento: Procedimento):
+        # lista de procedimentos, onde cada procedimento tem um custo, e o valor do atendimento é atualizado com base no custo do procedimento e no valor base do tipo de atendimento.
         pass
 
     def adicionar_pagamento(self, pagamento: Pagamento):
+        # 
         pass
 
     def calcular_valor_total(self):

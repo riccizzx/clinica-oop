@@ -1,5 +1,5 @@
 
-from tipo_atendimento import TipoAtendimento
+from model.tipo_atendimento import TipoAtendimento
 
 class Procedimento:
     def __init__(self, descricao, custo):

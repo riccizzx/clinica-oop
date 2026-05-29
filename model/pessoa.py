@@ -1,5 +1,6 @@
 
 from abc import ABC, abstractmethod
+from datetime import date
 
 class Pessoa(ABC):
     def __init__(self, nome: str, celular: str, cpf: str):
@@ -31,6 +32,11 @@ class Pessoa(ABC):
     def cpf(self, cpf: str):
         self.__cpf = cpf
 
+    def calcular_idade(self, data_nascimento):
+        hoje = date.today()
+        nascimento = data_nascimento
+        idade = hoje.year - nascimento.year - ((hoje.month, hoje.day) < (nascimento.month, nascimento.day))
+        return idade
 
     @abstractmethod
     def validar_cpf(self, cpf: str) -> bool:

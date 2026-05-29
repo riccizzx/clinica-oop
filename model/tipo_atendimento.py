@@ -31,5 +31,5 @@ class TipoAtendimento:
 
     # metodos;
     def atualizar_valor_base(self, novo_valor):
-        # o valor é atualizado com base em algum critério, por exemplo, inflação ou custos operacionais
+        # o valor é atualizado com base em algum critério, por exemplo, 
         self.__valor_base = novo_valor

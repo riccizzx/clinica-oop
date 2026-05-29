@@ -10,7 +10,7 @@
     """
 
 from abc import ABC, abstractmethod
-from .atendimento import Atendimento
+from model.atendimento import Atendimento
 
 class Pagamento(ABC):
     def __init__(self, data, valor, tipo_pagamento, cpf_pagador, numero_cartao=None):

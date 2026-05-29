@@ -1,6 +1,6 @@
 
 from abc import ABC, abstractmethod
-from pessoa import Pessoa
+from model.pessoa import Pessoa
 
 
 class Profissional(Pessoa):
