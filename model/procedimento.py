@@ -1,27 +1,25 @@
 
-from model.tipo_atendimento import TipoAtendimento
-
 class Procedimento:
-    def __init__(self, descricao, custo):
-        self.__descricao = descricao   
-        self.__custo = custo   
+    def __init__(self, descricao: str, custo: float):
+        self.__descricao = descricao
+        self.__custo = custo
 
     @property
     def descricao(self):
         return self.__descricao
-    
+
     @property
     def custo(self):
         return self.__custo
-    
+
     @descricao.setter
-    def descricao(self, descricao):
+    def descricao(self, descricao: str):
         self.__descricao = descricao
 
     @custo.setter
-    def custo(self, custo):
+    def custo(self, custo: float):
         self.__custo = custo
 
-    # metodos;
-    def calcular_custo_total(self, tipo_atendimento):
-        return self.__custo + tipo_atendimento.valor_base
+    def calcular_custo(self) -> float:
+        """Retorna o custo do procedimento."""
+        return self.__custo

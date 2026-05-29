@@ -4,12 +4,18 @@
 
 
 """
-#from clinica.model import procedimento
+#from __future__ import annotations
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from model.pagamento import Pagamento
+
+#from model.pagamento import Pagamento
 from model.paciente import Paciente
 from model.profissional import Profissional
 from model.procedimento import Procedimento
 from model.tipo_atendimento import TipoAtendimento
-from model.pagamento import Pagamento
 
 class Atendimento:
     def __init__(self, data, horario_inicio, horario_fim, valor):
@@ -17,6 +23,8 @@ class Atendimento:
         self.__horario_inicio = horario_inicio
         self.__horario_fim = horario_fim
         self.__valor = valor
+        self.__procedimentos: list[Procedimento] = []
+        self.__pagamentos: list[Pagamento] = []
 
     @property
     def data(self):

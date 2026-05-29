@@ -1,30 +1,56 @@
-
-from abc import ABC, abstractmethod
-#from .pessoa import Pessoa
+from datetime import date
 from model.pessoa import Pessoa
-from model.procedimento import Procedimento
-from model.atendimento import Atendimento
+
 
 class Paciente(Pessoa):
-    def __init__(self, data_nascimento, nome_responsavel = None, celular_responsavel = None):
-        super().__init__(data_nascimento)
+    def __init__(
+        self,
+        nome: str,
+        celular: str,
+        cpf: str,
+        data_nascimento: date,
+        nome_responsavel: str = None,
+        cpf_responsavel: str = None,
+    ):
+        super().__init__(nome, celular, cpf)
+        self.__data_nascimento = data_nascimento
         self.__nome_responsavel = nome_responsavel
-        self.__celular_responsavel = celular_responsavel
+        self.__cpf_responsavel = cpf_responsavel
 
-    
-    # abaixo vão os métodos;    
-    def verificar_idade(self):
-        idade = self.calcular_idade(self.data_nascimento)
-        if idade < 18:
-            return True
-        else:
-            return False
-        
-    def verificar_responsavel(self):
+    @property
+    def data_nascimento(self):
+        return self.__data_nascimento
+
+    @property
+    def nome_responsavel(self):
+        return self.__nome_responsavel
+
+    @property
+    def cpf_responsavel(self):
+        return self.__cpf_responsavel
+
+    @data_nascimento.setter
+    def data_nascimento(self, data_nascimento: date):
+        self.__data_nascimento = data_nascimento
+
+    @nome_responsavel.setter
+    def nome_responsavel(self, nome_responsavel: str):
+        self.__nome_responsavel = nome_responsavel
+
+    @cpf_responsavel.setter
+    def cpf_responsavel(self, cpf_responsavel: str):
+        self.__cpf_responsavel = cpf_responsavel
+
+    def validar_cpf(self) -> bool:
+        return len(self.cpf) == 11 and self.cpf.isdigit()
+
+    def verificar_idade(self) -> bool:
+        return self.calcular_idade(self.__data_nascimento) < 18
+
+    def verificar_resp(self) -> bool:
         if self.verificar_idade():
-            if self.__nome_responsavel is not None and self.__celular_responsavel is not None:
-                return True
-            else:
-                return False
-        else:
-            return True
+            return (
+                self.__nome_responsavel is not None
+                and self.__cpf_responsavel is not None
+            )
+        return True
