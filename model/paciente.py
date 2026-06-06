@@ -3,8 +3,7 @@ from model.pessoa import Pessoa
 
 
 class Paciente(Pessoa):
-    def __init__(
-        self,
+    def __init__(self,
         nome: str,
         celular: str,
         cpf: str,
