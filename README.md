@@ -1,7 +1,7 @@
 # Sistema de Gerenciamento de Clínicas
 
 Trabalho da disciplina INE5605 - Desenvolvimento de Sistemas Orientados a Objetos I
-Curso de Sistemas de Informação — UFSC
+Curso de Sistemas de Informação - UFSC
 
 **Autores:** Guilherme Ricci Machado Villela e Lucas Keller da Silva
 
