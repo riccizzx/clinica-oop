@@ -1,30 +1,36 @@
-
-"""
-
-
-
-"""
-#from __future__ import annotations
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from model.pagamento import Pagamento
-
-#from model.pagamento import Pagamento
-from model.paciente import Paciente
-from model.profissional import Profissional
-from model.procedimento import Procedimento
-from model.tipo_atendimento import TipoAtendimento
+    from model.clinica import Clinica
+    from model.paciente import Paciente
+    from model.profissional import Profissional
+    from model.procedimento import Procedimento
+    from model.tipo_atendimento import TipoAtendimento
 
 class Atendimento:
-    def __init__(self, data, horario_inicio, horario_fim, valor):
+    def __init__(
+        self,
+        data: str,
+        horario_inicio: str,
+        horario_fim: str, 
+        valor: float,
+        clinica: "Clinica",
+        paciente: "Paciente",
+        profissional: "Profissional",
+        tipo_atendimento: "TipoAtendimento",
+    ):
         self.__data = data
         self.__horario_inicio = horario_inicio
         self.__horario_fim = horario_fim
         self.__valor = valor
-        self.__procedimentos: list[Procedimento] = []
-        self.__pagamentos: list[Pagamento] = []
+        self.__clinica = clinica
+        self.__paciente = paciente
+        self.__profissional = profissional
+        self.__tipo_atendimento = tipo_atendimento
+        self.__procedimentos: list["Procedimento"] = []
+        self.__pagamentos: list["Pagamento"] = []
 
     @property
     def data(self):
@@ -42,30 +48,61 @@ class Atendimento:
     def valor(self):
         return self.__valor
     
+    @property
+    def clinica(self):
+        return self.__clinica
+    
+    @property
+    def paciente(self):
+        return self.__paciente
+    
+    @property
+    def profissional(self):
+        return self.__profissional
+    
+    @property
+    def tipo_atendimento(self):
+        return self.__tipo_atendimento
+    
+    @property
+    def procedimentos(self):
+        return list(self.__procedimentos)
+    
+    @property
+    def pagamentos(self):
+        return list(self.__pagamentos)
+    
     @data.setter
-    def data(self, data):
+    def data(self, data: str):
         self.__data = data
 
     @horario_inicio.setter
-    def horario_inicio(self, horario_inicio):
+    def horario_inicio(self, horario_inicio: str):
         self.__horario_inicio = horario_inicio
 
     @horario_fim.setter
-    def horario_fim(self, horario_fim):
+    def horario_fim(self, horario_fim: str):
         self.__horario_fim = horario_fim
 
     @valor.setter
-    def valor(self, valor):
+    def valor(self, valor: float):
         self.__valor = valor
-
-    # metodos;
-    def agendar(self, tipo_atendimento: TipoAtendimento, paciente: Paciente,
-                 profissional: Profissional, horario_inicio, horario_fim):
-        pass
-
-    def cancelar(self, tipo_atendimento: TipoAtendimento, paciente: Paciente,
-                  profissional: Profissional, horario_inicio, horario_fim):
-        pass
+    
+    @clinica.setter
+    def clinica(self, clinica: "Clinica"):
+        self.__clinica = clinica
+    
+    @paciente.setter
+    def paciente(self, paciente: "Paciente"):
+        self.__paciente = paciente
+    
+    @profissional.setter
+    def profissional(self, profissional: "Profissional"):
+        self.__profissional = profissional
+    
+    @tipo_atendimento.setter
+    def tipo_atendimento(self, tipo_atendimento: "TipoAtendimento"):
+        self.__tipo_atendimento = tipo_atendimento
 
     def validar_horario(self) -> bool:
         try:
@@ -74,18 +111,19 @@ class Atendimento:
             return False
         
     def adicionar_procedimento(self, procedimento: Procedimento):
-        # lista de procedimentos, onde cada procedimento tem um custo, e o valor do atendimento é atualizado com base no custo do procedimento e no valor base do tipo de atendimento.
-        pass
+        # Lista de procedimentos, onde cada procedimento tem um custo, e o valor do atendimento é atualizado com base no custo do procedimento e no valor base do tipo de atendimento
+        self.__procedimentos.append(procedimento)
 
     def adicionar_pagamento(self, pagamento: Pagamento):
-        # 
-        pass
+        self.__pagamentos.append(pagamento)
 
-    def calcular_valor_total(self):
-        pass
+    def calcular_valor_total(self) -> float:
+        custo_procedimentos = sum(p.calcular_custo() for p in self.__procedimentos)
+        return self.__valor + custo_procedimentos
 
-    def calcular_valor_restante(self):
-        pass
+    def calcular_valor_restante(self) -> float:
+        total_pago = sum(p.valor_pago for p in self.__pagamentos)
+        return self.calcular_valor_total() - total_pago
 
-    def verificar_pagamento_restante(self):
-        pass
+    def verificar_pagamento_restante(self) -> bool:
+        return self.calcular_valor_restante() > 0

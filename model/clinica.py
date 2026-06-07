@@ -1,14 +1,10 @@
-
 """
-DEIXAR CLARO QUE PODE OCORRER REFORMULAÇÕES NAS CLASSES, POIS AINDA ESTAMOS NA FASE DE PLANEJAMENTO
-
 Com base na arquitetura (MVC) Model-View-Controller, o módulo Clinica é responsável por representar a lógica de negócio do sistema,
 ou seja, as classes e funções que definem o comportamento do sistema e como ele deve funcionar.
 
 Clinica é o módulo principal do projeto, onde estão as classes e funções que representam a lógica de negócio do sistema.
 
 Com base no diagrama do model, basta escrever as classes nesta pasta model
-
 """
 
 from model.atendimento import Atendimento
@@ -16,9 +12,9 @@ from model.profissional import Profissional
 from model.paciente import Paciente
 
 class Clinica:
-    def __init__(self, nome, endereco, horario_abertura, horario_fechamento):
+    def __init__(self, nome: str, cidade: str, horario_abertura: str, horario_fechamento: str):
         self.__nome = nome
-        self.__endereco = endereco
+        self.__cidade = cidade
         self.__horario_abertura = horario_abertura
         self.__horario_fechamento = horario_fechamento
 
@@ -27,8 +23,8 @@ class Clinica:
         return self.__nome
     
     @property
-    def endereco(self):
-        return self.__endereco
+    def cidade(self):
+        return self.__cidade
     
     @property
     def horario_abertura(self):
@@ -42,9 +38,9 @@ class Clinica:
     def nome(self, nome):
         self.__nome = nome
 
-    @endereco.setter
-    def endereco(self, endereco):
-        self.__endereco = endereco
+    @cidade.setter
+    def cidade(self, cidade):
+        self.__cidade = cidade
 
     @horario_abertura.setter
     def horario_abertura(self, horario_abertura):
@@ -54,15 +50,12 @@ class Clinica:
     def horario_fechamento(self, horario_fechamento):
         self.__horario_fechamento = horario_fechamento
 
-    # métodos;
-    def esta_aberta(self, horario_atual) -> bool:
-        if self.__horario_abertura <= horario_atual < self.__horario_fechamento:
-            return True
-        else:
-            return False
+    def esta_aberta(self, horario_atual: str) -> bool:
+        return self.__horario_abertura <= horario_atual < self.__horario_fechamento
         
-    def validar_horario_atendimento(self, horario_inicio, horario_fim) -> bool:
-        if self.esta_aberta(horario_inicio) and self.esta_aberta(horario_fim) and horario_inicio < horario_fim:
-            return True
-        else:
-            return False
+    def validar_horario_atendimento(self, horario_inicio: str, horario_fim: str) -> bool:
+        return (
+            self.esta_aberta(horario_inicio)
+            and self.esta_aberta(horario_fim)
+            and horario_inicio < horario_fim
+        )
