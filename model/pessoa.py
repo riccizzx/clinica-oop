@@ -7,7 +7,6 @@ class Pessoa(ABC):
         self.__nome = nome
         self.__celular = celular
         self.__cpf = cpf
-        self.__data_nascimento = None  
 
     @property
     def nome(self):

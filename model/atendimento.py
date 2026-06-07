@@ -125,5 +125,5 @@ class Atendimento:
         total_pago = sum(p.valor_pago for p in self.__pagamentos)
         return self.calcular_valor_total() - total_pago
 
-    def verificar_pagamento_restante(self) -> bool:
+    def verificar_pagamento_pendente(self) -> bool:
         return self.calcular_valor_restante() > 0

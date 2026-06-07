@@ -7,10 +7,6 @@ Clinica é o módulo principal do projeto, onde estão as classes e funções qu
 Com base no diagrama do model, basta escrever as classes nesta pasta model
 """
 
-from model.atendimento import Atendimento
-from model.profissional import Profissional
-from model.paciente import Paciente
-
 class Clinica:
     def __init__(self, nome: str, cidade: str, horario_abertura: str, horario_fechamento: str):
         self.__nome = nome

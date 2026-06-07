@@ -27,8 +27,8 @@ class ControladorSistema:
         self.__controlador_atendimento = ControladorAtendimento(
             self.__controlador_paciente,
             self.__controlador_clinica,
-            self.__controlador_profissional,
-            self.__controlador_tipo_atendimento,
+            None,  # controlador_profissional - aguardando parte do Guilherme
+            None,  # controlador_tipo_atendimento - aguardando parte do Guilherme
         )
         # self.__controlador_procedimento = ControladorProcedimento(
         #     self.__controlador_profissional,
@@ -37,7 +37,7 @@ class ControladorSistema:
         # self.__controlador_pagamento = ControladorPagamento(
         #     self.__controlador_atendimento,
         # )
-        
+
         # Telas
         self.__tela_paciente = TelaPaciente(self.__controlador_paciente)
         self.__tela_clinica = TelaClinica(self.__controlador_clinica)
@@ -48,44 +48,35 @@ class ControladorSistema:
         # self.__tela_pagamento = TelaPagamento(self.__controlador_pagamento)
         self.__tela_relatorios = TelaRelatorios(
             self.__controlador_atendimento,
-            self.__controlador_procedimento,
+            None,  # controlador_procedimento - aguardando parte do Guilherme
         )
-        
-    def iniciar(self):
-            while True:
-                print("\n=== SISTEMA DE CLÍNICAS ===")
-                print("--- Cadastros ---")
-                print("1. Pacientes")
-                print("2. Clínicas")
-                print("3. Profissionais")
-                print("4. Tipos de atendimento")
-                print("--- Registros ---")
-                print("5. Atendimentos")
-                print("6. Procedimentos")
-                print("7. Pagamentos")
-                print("--- Relatórios ---")
-                print("8. Relatórios")
-                print("0. Sair")
-                opcao = input("Escolha uma opção: ").strip()
 
-                if opcao == "1":
-                    self.__tela_paciente.mostrar_menu()
-                elif opcao == "2":
-                    self.__tela_clinica.mostrar_menu()
-                elif opcao == "3":
-                    self.__tela_profissional.mostrar_menu()
-                elif opcao == "4":
-                    self.__tela_tipo_atendimento.mostrar_menu()
-                elif opcao == "5":
-                    self.__tela_atendimento.mostrar_menu()
-                elif opcao == "6":
-                    self.__tela_procedimento.mostrar_menu()
-                elif opcao == "7":
-                    self.__tela_pagamento.mostrar_menu()
-                elif opcao == "8":
-                    self.__tela_relatorios.mostrar_menu()
-                elif opcao == "0":
-                    print("Encerrando o sistema. Até logo!")
-                    break
-                else:
-                    print("Opção inválida.")
+    def iniciar(self):
+        while True:
+            print("\n=== SISTEMA DE CLÍNICAS ===")
+            print("--- Cadastros ---")
+            print("1. Pacientes")
+            print("2. Clínicas")
+            print("3. Profissionais")
+            print("4. Tipos de atendimento")
+            print("--- Registros ---")
+            print("5. Atendimentos")
+            print("6. Procedimentos")
+            print("7. Pagamentos")
+            print("--- Relatórios ---")
+            print("8. Relatórios")
+            print("0. Sair")
+            opcao = input("Escolha uma opção: ").strip()
+
+            if opcao == "1":
+                self.__tela_paciente.mostrar_menu()
+            elif opcao == "2":
+                self.__tela_clinica.mostrar_menu()
+            elif opcao == "3":
+                self.__tela_profissional.mostrar_menu()
+            elif opcao == "4":
+                self.__tela_tipo_atendimento.mostrar_menu()
+            elif opcao == "5":
+                self.__tela_atendimento.mostrar_menu()
+            elif opcao == "6":
+                self.__tela_procedimento.mostrar_menu()
