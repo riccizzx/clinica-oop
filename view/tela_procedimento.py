@@ -1,6 +1,6 @@
 class TelaProcedimento:
-    def init(self, controlador_procedimento):
-        self.controlador_procedimento = controlador_procedimento
+    def __init__(self, controlador_procedimento):
+        self.__controlador_procedimento = controlador_procedimento
 
     def mostrar_menu(self):
         while True:
@@ -31,7 +31,7 @@ class TelaProcedimento:
             custo = float(input("Custo (R$): ").strip())
             cpf_profissional = input("CPF do profissional responsável: ").strip()
             index = int(input("Número do atendimento vinculado: ").strip()) - 1
-            self.controlador_procedimento.cadastrar(descricao, custo, cpf_profissional, index)
+            self.__controlador_procedimento.cadastrar(descricao, custo, cpf_profissional, index)
             print("Procedimento registrado com sucesso!")
         except ValueError as e:
             print(f"Erro: {e}")
@@ -44,6 +44,7 @@ class TelaProcedimento:
             print("Procedimento removido com sucesso!")
         except ValueError as e:
             print(f"Erro: {e}")
+
     def alterar(self):
         try:
             self.listar()
@@ -53,14 +54,14 @@ class TelaProcedimento:
             custo_str = input("Novo custo (R$): ").strip()
             custo = float(custo_str) if custo_str else None
             cpf_profissional = input("Novo CPF do profissional responsável: ").strip() or None
-            self.controlador_procedimento.alterar(index, descricao, custo, cpf_profissional)
+            self.__controlador_procedimento.alterar(index, descricao, custo, cpf_profissional)
             print("Procedimento alterado com sucesso!")
         except ValueError as e:
             print(f"Erro: {e}")
 
     def listar(self):
         try:
-            procedimentos = self.controlador_procedimento.listar()
+            procedimentos = self.__controlador_procedimento.listar()
             print("\n=== PROCEDIMENTOS ===")
             for i, p in enumerate(procedimentos):
                 print(f"{i+1}. {p.descricao} | Custo: R${p.calcular_custo():.2f} | Profissional: {p.profissional_responsavel.nome}")
