@@ -1,9 +1,8 @@
 from model.tipo_atendimento import TipoAtendimento
 
-
 class TelaTipoAtendimento:
-    def init(self, controlador_tipo_atendimento):
-        self.controlador_tipo_atendimento = controlador_tipo_atendimento
+    def __init__(self, controlador_tipo_atendimento):
+        self.__controlador_tipo_atendimento = controlador_tipo_atendimento
 
     def mostrar_menu(self):
         while True:
@@ -34,7 +33,7 @@ class TelaTipoAtendimento:
             descricao = input("Descrição: ").strip()
             valor_base = float(input("Valor base (R$): ").strip())
             tipo = TipoAtendimento(nome, descricao, valor_base)
-            self.controlador_tipo_atendimento.cadastrar(tipo)
+            self.__controlador_tipo_atendimento.cadastrar(tipo)
             print("Tipo de atendimento cadastrado com sucesso!")
         except ValueError as e:
             print(f"Erro: {e}")
@@ -46,6 +45,7 @@ class TelaTipoAtendimento:
             print("Tipo de atendimento removido com sucesso!")
         except ValueError as e:
             print(f"Erro: {e}")
+
     def alterar(self):
         try:
             nome = input("Nome do tipo a alterar: ").strip()
@@ -54,14 +54,14 @@ class TelaTipoAtendimento:
             descricao = input("Nova descrição: ").strip() or None
             valor_str = input("Novo valor base (R$): ").strip()
             valor_base = float(valor_str) if valor_str else None
-            self.controlador_tipo_atendimento.alterar(nome, novo_nome, descricao, valor_base)
+            self.__controlador_tipo_atendimento.alterar(nome, novo_nome, descricao, valor_base)
             print("Tipo de atendimento alterado com sucesso!")
         except ValueError as e:
             print(f"Erro: {e}")
 
     def listar(self):
         try:
-            tipos = self.controlador_tipo_atendimento.listar()
+            tipos = self.__controlador_tipo_atendimento.listar()
             print("\n=== TIPOS DE ATENDIMENTO ===")
             for i, t in enumerate(tipos):
                 print(f"{i+1}. {t.nome} | Descrição: {t.descricao} | Valor base: R${t.valor_base:.2f}")

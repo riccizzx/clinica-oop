@@ -1,4 +1,3 @@
-
 from abc import ABC, abstractmethod
 from datetime import date
 
@@ -44,6 +43,6 @@ class Pessoa(ABC):
         )
         return idade
 
-    #@abstractmethod
-    #def validar_cpf(self) -> bool:
-    #    pass
+    @abstractmethod
+    def validar_cpf(self) -> bool:
+       pass

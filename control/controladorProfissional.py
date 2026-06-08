@@ -1,20 +1,20 @@
 class ControladorProfissional:
-    def init(self):
-        self.profissionais = []
+    def __init__(self):
+        self.__profissionais = []
 
     def cadastrar(self, profissional):
-        for p in self.profissionais:
+        for p in self.__profissionais:
             if p.cpf == profissional.cpf:
                 raise ValueError(f"Já existe um profissional com o CPF {profissional.cpf}.")
         if not profissional.validar_cpf():
             raise ValueError("CPF inválido.")
         if not profissional.validar_registro():
             raise ValueError("Registro profissional inválido.")
-        self.profissionais.append(profissional)
+        self.__profissionais.append(profissional)
 
     def remover(self, cpf):
         profissional = self.buscar_por_cpf(cpf)
-        self.profissionais.remove(profissional)
+        self.__profissionais.remove(profissional)
 
     def alterar(self, cpf, nome=None, celular=None, especialidade=None, registro_profissional=None):
         profissional = self.buscar_por_cpf(cpf)
@@ -28,9 +28,9 @@ class ControladorProfissional:
             profissional.registro_profissional = registro_profissional
 
     def listar(self):
-        if not self.profissionais:
+        if not self.__profissionais:
             raise ValueError("Nenhum profissional cadastrado.")
-        return list(self.profissionais)
+        return list(self.__profissionais)
 
     def buscar_por_cpf(self, cpf):
         for p in self.__profissionais:

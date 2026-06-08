@@ -1,5 +1,5 @@
 class TelaPagamento:
-    def init(self, controlador_pagamento):
+    def __init__(self, controlador_pagamento):
         self.__controlador_pagamento = controlador_pagamento
 
     def mostrar_menu(self):
@@ -24,6 +24,7 @@ class TelaPagamento:
                 break
             else:
                 print("Opção inválida.")
+
     def cadastrar(self):
         try:
             index = int(input("Número do atendimento a pagar: ").strip()) - 1
@@ -46,7 +47,7 @@ class TelaPagamento:
             else:
                 raise ValueError("Tipo de pagamento inválido.")
 
-            self.controlador_pagamento.cadastrar(
+            self.__controlador_pagamento.cadastrar(
                 tipo, data, valor_pago, index,
                 cpf_pagador, numero_cartao, bandeira_cartao
             )
@@ -58,10 +59,11 @@ class TelaPagamento:
         try:
             self.listar()
             index = int(input("Número do pagamento a remover: ").strip()) - 1
-            self.controlador_pagamento.remover(index)
+            self.__controlador_pagamento.remover(index)
             print("Pagamento removido com sucesso!")
         except ValueError as e:
             print(f"Erro: {e}")
+
     def alterar(self):
         try:
             self.listar()
@@ -70,16 +72,16 @@ class TelaPagamento:
             data = input("Nova data (AAAA-MM-DD): ").strip() or None
             valor_str = input("Novo valor pago (R$): ").strip()
             valor_pago = float(valor_str) if valor_str else None
-            self.controlador_pagamento.alterar(index, data, valor_pago)
+            self.__controlador_pagamento.alterar(index, data, valor_pago)
             print("Pagamento alterado com sucesso!")
         except ValueError as e:
             print(f"Erro: {e}")
 
     def listar(self):
         try:
-            pagamentos = self.controlador_pagamento.listar()
+            pagamentos = self.__controlador_pagamento.listar()
             print("\n=== PAGAMENTOS ===")
             for i, p in enumerate(pagamentos):
-                print(f"{i+1}. Data: {p.data} | Valor pago: R${p.valor_pago:.2f} | Tipo: {type(p).name}")
+                print(f"{i+1}. Data: {p.data} | Valor pago: R${p.valor_pago:.2f} | Tipo: {type(p).__name__}")
         except ValueError as e:
             print(f"Erro: {e}")

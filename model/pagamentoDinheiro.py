@@ -15,7 +15,7 @@ class PagamentoDinheiro(Pagamento):
 
     def validar_pagamento(self, atendimento: "Atendimento") -> bool:
         # Valida se o valor pago é suficiente para cobrir o atendimento
-        return self.valor_pago >= atendimento.calcular_valor_restante()
+        return self.valor_pago > 0
 
     def calcular_saldo(self, atendimento: "Atendimento") -> float:
         # Calcula o saldo/troco após o pagamento
