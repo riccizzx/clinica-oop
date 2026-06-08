@@ -2,14 +2,13 @@ from model.pagamentoDinheiro import PagamentoDinheiro
 from model.pagamentoPix import PagamentoPix
 from model.pagamentoCartao import PagamentoCartao
 
-
 class ControladorPagamento:
-    def init(self, controlador_atendimento):
-        self.pagamentos = []
-        self.controlador_atendimento = controlador_atendimento
+    def __init__(self, controlador_atendimento):
+        self.__pagamentos = []
+        self.__controlador_atendimento = controlador_atendimento
 
     def cadastrar(self, tipo, data, valor_pago, index_atendimento, cpf_pagador=None, numero_cartao=None, bandeira_cartao=None):
-        atendimento = self.controlador_atendimento.buscar(index_atendimento)
+        atendimento = self.__controlador_atendimento.buscar(index_atendimento)
 
         if atendimento.verificar_pagamento_pendente() is False:
             raise ValueError("Este atendimento já está totalmente pago.")
@@ -33,12 +32,13 @@ class ControladorPagamento:
             raise ValueError("Pagamento inválido. Verifique os dados informados.")
 
         atendimento.adicionar_pagamento(pagamento)
-        self.pagamentos.append(pagamento)
+        self.__pagamentos.append(pagamento)
         return pagamento
+
     def remover(self, index):
-        if index < 0 or index >= len(self.pagamentos):
+        if index < 0 or index >= len(self.__pagamentos):
             raise ValueError("Pagamento não encontrado.")
-        self.pagamentos.pop(index)
+        self.__pagamentos.pop(index)
 
     def alterar(self, index, data=None, valor_pago=None):
         pagamento = self.buscar(index)
@@ -48,11 +48,11 @@ class ControladorPagamento:
             pagamento.valor_pago = valor_pago
 
     def listar(self):
-        if not self.pagamentos:
+        if not self.__pagamentos:
             raise ValueError("Nenhum pagamento registrado.")
-        return list(self.pagamentos)
+        return list(self.__pagamentos)
 
     def buscar(self, index):
-        if index < 0 or index >= len(self.pagamentos):
+        if index < 0 or index >= len(self.__pagamentos):
             raise ValueError("Pagamento não encontrado.")
-        return self.pagamentos[index]
+        return self.__pagamentos[index]
