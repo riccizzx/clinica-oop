@@ -26,7 +26,7 @@ class PagamentoPix(Pagamento):
         # Valida se o valor pago é suficiente para cobrir o atendimento
         if not (self.__cpf_pagador and len(self.__cpf_pagador) == 11 and self.__cpf_pagador.isdigit()):
             return False
-        return self.valor_pago >= atendimento.calcular_valor_restante()
+        return self.valor_pago > 0
     
     def calcular_saldo(self, atendimento: "Atendimento") -> float:
         # Calcula o saldo/troco após o pagamento

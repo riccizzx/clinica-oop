@@ -44,7 +44,7 @@ class PagamentoCartao(Pagamento):
         # Valida se o cartão está correto
         if not self.validar_cartao():
             return False
-        return self.valor_pago >= atendimento.calcular_valor_restante()
+        return self.valor_pago > 0
     
     def calcular_saldo(self, atendimento: "Atendimento") -> float:
         # Calcula o saldo após o pagamento
