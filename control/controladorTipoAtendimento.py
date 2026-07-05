@@ -1,11 +1,16 @@
+from model.tipo_atendimento import TipoAtendimento
+from Exceptions.tipoAtendimentoException import TipoAtendimentoException
+
 class ControladorTipoAtendimento:
     def __init__(self):
         self.__tipos = []
 
-    def cadastrar(self, tipo):
+    def cadastrar(self, nome, descricao, valor_base):
         for t in self.__tipos:
-            if t.nome == tipo.nome:
-                raise ValueError(f"Já existe um tipo de atendimento com o nome '{tipo.nome}'.")
+            if t.nome == nome:
+                raise TipoAtendimentoException(f"Já existe um tipo de atendimento com o nome '{nome}'.")
+        
+        tipo = TipoAtendimento(nome, descricao, valor_base)
         self.__tipos.append(tipo)
 
     def remover(self, nome):
@@ -23,11 +28,19 @@ class ControladorTipoAtendimento:
 
     def listar(self):
         if not self.__tipos:
-            raise ValueError("Nenhum tipo de atendimento cadastrado.")
-        return list(self.__tipos)
+            raise TipoAtendimentoException("Nenhum tipo de atendimento cadastrado.")
+        
+        return [
+            {
+                "nome": t.nome,
+                "descricao": t.descricao,
+                "valor_base": t.valor_base
+            }
+            for t in self.__tipos
+        ]
 
     def buscar(self, nome):
         for t in self.__tipos:
             if t.nome == nome:
                 return t
-        raise ValueError(f"Tipo de atendimento '{nome}' não encontrado.")
+        raise TipoAtendimentoException(f"Tipo de atendimento '{nome}' não encontrado.")

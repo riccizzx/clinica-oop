@@ -1,4 +1,5 @@
 from model.atendimento import Atendimento
+from Exceptions.atendimentoException import AtendimentoException
 
 class ControladorAtendimento:
     def __init__(self, controlador_paciente, controlador_clinica, controlador_profissional, controlador_tipo_atendimento):
@@ -15,9 +16,9 @@ class ControladorAtendimento:
         tipo = self.__controlador_tipo_atendimento.buscar(nome_tipo)
 
         if not clinica.validar_horario_atendimento(horario_inicio, horario_fim):
-            raise ValueError("Horário fora do funcionamento da clínica.")
+            raise AtendimentoException("Horário fora do funcionamento da clínica.")
         if paciente.verificar_idade() and not paciente.verificar_resp():
-            raise ValueError("Paciente menor de idade sem responsável cadastrado.")
+            raise AtendimentoException("Paciente menor de idade sem responsável cadastrado.")
 
         atendimento = Atendimento(data, horario_inicio, horario_fim, valor, clinica, paciente, profissional, tipo)
         self.__atendimentos.append(atendimento)
@@ -25,7 +26,7 @@ class ControladorAtendimento:
 
     def remover(self, index):
         if index < 0 or index >= len(self.__atendimentos):
-            raise ValueError("Atendimento não encontrado.")
+            raise AtendimentoException("Atendimento não encontrado.")
         self.__atendimentos.pop(index)
 
     def alterar(self, index, data=None, horario_inicio=None, horario_fim=None, valor=None):
@@ -41,17 +42,31 @@ class ControladorAtendimento:
 
     def listar(self):
         if not self.__atendimentos:
-            raise ValueError("Nenhum atendimento registrado.")
-        return list(self.__atendimentos)
+            raise AtendimentoException("Nenhum atendimento registrado.")
+        
+        return [
+            {
+                "data": a.data,
+                "horario_inicio": a.horario_inicio,
+                "horario_fim": a.horario_fim,
+                "tipo_atendimento": a.tipo_atendimento.nome,
+                "paciente": a.paciente.nome,
+                "profissional": a.profissional.nome,
+                "clinica": a.clinica.nome,
+                "valor_total": a.calcular_valor_total(),
+                "valor_restante": a.calcular_valor_restante()
+            }
+            for a in self.__atendimentos
+        ]
 
     def buscar(self, index):
         if index < 0 or index >= len(self.__atendimentos):
-            raise ValueError("Atendimento não encontrado.")
+            raise AtendimentoException("Atendimento não encontrado.")
         return self.__atendimentos[index]
 
     def relatorio_clinicas_mais_atendimentos(self):
         if not self.__atendimentos:
-            raise ValueError("Nenhum atendimento registrado.")
+            raise AtendimentoException("Nenhum atendimento registrado.")
         contagem = {}
         for a in self.__atendimentos:
             chave = f"{a.clinica.nome} - {a.clinica.cidade}"
@@ -60,9 +75,16 @@ class ControladorAtendimento:
 
     def relatorio_atendimentos_mais_caros_baratos(self):
         if not self.__atendimentos:
-            raise ValueError("Nenhum atendimento registrado.")
+            raise AtendimentoException("Nenhum atendimento registrado.")
         ordenados = sorted(self.__atendimentos, key=lambda a: a.calcular_valor_total(), reverse=True)
+        # We need to return primitives/dicts here for the view
+        mais_caros = [
+            {"data": a.data, "paciente": a.paciente.nome, "valor_total": a.calcular_valor_total()} for a in ordenados[:3]
+        ]
+        mais_baratos = [
+            {"data": a.data, "paciente": a.paciente.nome, "valor_total": a.calcular_valor_total()} for a in ordenados[-3:]
+        ]
         return {
-            "mais_caros": ordenados[:3],
-            "mais_baratos": ordenados[-3:]
+            "mais_caros": mais_caros,
+            "mais_baratos": mais_baratos
         }

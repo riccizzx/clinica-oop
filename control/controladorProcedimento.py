@@ -1,4 +1,5 @@
 from model.procedimento import Procedimento
+from Exceptions.procedimentoException import ProcedimentoException
 
 class ControladorProcedimento:
     def __init__(self, controlador_profissional, controlador_atendimento):
@@ -16,7 +17,7 @@ class ControladorProcedimento:
 
     def remover(self, index):
         if index < 0 or index >= len(self.__procedimentos):
-            raise ValueError("Procedimento não encontrado.")
+            raise ProcedimentoException(f"Índice de procedimento inválido: {index}")
         self.__procedimentos.pop(index)
 
     def alterar(self, index, descricao=None, custo=None, cpf_profissional=None):
@@ -24,6 +25,8 @@ class ControladorProcedimento:
         if descricao:
             procedimento.descricao = descricao
         if custo is not None:
+            if custo < 0:
+                raise ProcedimentoException("Custo inválido")
             procedimento.custo = custo
         if cpf_profissional:
             profissional = self.__controlador_profissional.buscar_por_cpf(cpf_profissional)
@@ -31,17 +34,25 @@ class ControladorProcedimento:
 
     def listar(self):
         if not self.__procedimentos:
-            raise ValueError("Nenhum procedimento registrado.")
-        return list(self.__procedimentos)
+            raise ProcedimentoException("Nenhum procedimento registrado.")
+        
+        return [
+            {
+                "descricao": p.descricao,
+                "custo": p.calcular_custo(),
+                "profissional": p.profissional_responsavel.nome
+            }
+            for p in self.__procedimentos
+        ]
 
     def buscar(self, index):
         if index < 0 or index >= len(self.__procedimentos):
-            raise ValueError("Procedimento não encontrado.")
+            raise ProcedimentoException(f"Índice de procedimento inválido: {index}")
         return self.__procedimentos[index]
 
     def relatorio_mais_populares(self):
         if not self.__procedimentos:
-            raise ValueError("Nenhum procedimento registrado.")
+            raise ProcedimentoException("Nenhum procedimento registrado.")
         contagem = {}
         for p in self.__procedimentos:
             contagem[p.descricao] = contagem.get(p.descricao, 0) + 1
@@ -49,9 +60,15 @@ class ControladorProcedimento:
 
     def relatorio_mais_caros_baratos(self):
         if not self.__procedimentos:
-            raise ValueError("Nenhum procedimento registrado.")
+            raise ProcedimentoException("Nenhum procedimento registrado.")
         ordenados = sorted(self.__procedimentos, key=lambda p: p.calcular_custo(), reverse=True)
+        mais_caros = [
+            {"descricao": p.descricao, "custo": p.calcular_custo()} for p in ordenados[:3]
+        ]
+        mais_baratos = [
+            {"descricao": p.descricao, "custo": p.calcular_custo()} for p in ordenados[-3:]
+        ]
         return {
-            "mais_caros": ordenados[:3],
-            "mais_baratos": ordenados[-3:]
+            "mais_caros": mais_caros,
+            "mais_baratos": mais_baratos
         }

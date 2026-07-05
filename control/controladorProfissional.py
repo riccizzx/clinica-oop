@@ -1,15 +1,22 @@
+from model.profissional import Profissional
+from Exceptions.profissionalException import ProfissionalException
+
 class ControladorProfissional:
     def __init__(self):
         self.__profissionais = []
 
-    def cadastrar(self, profissional):
+    def cadastrar(self, nome, celular, cpf, data_nascimento, especialidade, registro_profissional):
         for p in self.__profissionais:
-            if p.cpf == profissional.cpf:
-                raise ValueError(f"Já existe um profissional com o CPF {profissional.cpf}.")
+            if p.cpf == cpf:
+                raise ProfissionalException(f"Já existe um profissional com o CPF {cpf}.")
+        
+        profissional = Profissional(nome, celular, cpf, data_nascimento, especialidade, registro_profissional)
+        
         if not profissional.validar_cpf():
-            raise ValueError("CPF inválido.")
+            raise ProfissionalException("CPF inválido.")
         if not profissional.validar_registro():
-            raise ValueError("Registro profissional inválido.")
+            raise ProfissionalException("Registro profissional inválido.")
+            
         self.__profissionais.append(profissional)
 
     def remover(self, cpf):
@@ -29,11 +36,22 @@ class ControladorProfissional:
 
     def listar(self):
         if not self.__profissionais:
-            raise ValueError("Nenhum profissional cadastrado.")
-        return list(self.__profissionais)
+            raise ProfissionalException("Nenhum profissional cadastrado.")
+        
+        return [
+            {
+                "nome": p.nome,
+                "celular": p.celular,
+                "cpf": p.cpf,
+                "data_nascimento": p.data_nascimento,
+                "especialidade": p.especialidade,
+                "registro_profissional": p.registro_profissional
+            }
+            for p in self.__profissionais
+        ]
 
     def buscar_por_cpf(self, cpf):
         for p in self.__profissionais:
             if p.cpf == cpf:
                 return p
-        raise ValueError(f"Profissional com CPF {cpf} não encontrado.")
+        raise ProfissionalException(f"Profissional com CPF {cpf} não encontrado.")

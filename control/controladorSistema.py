@@ -1,5 +1,4 @@
-# Aqui será a implementação do controlador do sistema, onde serão implementados os métodos para realizar as operações do sistema, como cadastrar paciente, cadastrar atendimento, realizar pagamento, etc.
-
+import FreeSimpleGUI as sg
 from control.controladorPaciente import ControladorPaciente
 from control.controladorClinica import ControladorClinica
 from control.controladorProfissional import ControladorProfissional
@@ -52,40 +51,44 @@ class ControladorSistema:
         )
 
     def iniciar(self):
+        sg.theme('LightBlue')
+        layout = [
+            [sg.Text('=== SISTEMA DE CLÍNICAS ===', font=('Helvetica', 16, 'bold'), justification='center', expand_x=True)],
+            [sg.Frame('Cadastros', [
+                [sg.Button('Pacientes', size=(15, 2)), sg.Button('Clínicas', size=(15, 2))],
+                [sg.Button('Profissionais', size=(15, 2)), sg.Button('Tipos de atendimento', size=(15, 2))]
+            ], expand_x=True, element_justification='c')],
+            [sg.Frame('Registros', [
+                [sg.Button('Atendimentos', size=(15, 2)), sg.Button('Procedimentos', size=(15, 2)), sg.Button('Pagamentos', size=(15, 2))]
+            ], expand_x=True, element_justification='c')],
+            [sg.Frame('Relatórios', [
+                [sg.Button('Relatórios', size=(49, 2))]
+            ], expand_x=True, element_justification='c')],
+            [sg.Button('Sair', button_color=('white', 'red'), size=(10, 1))]
+        ]
+        
+        window = sg.Window('Sistema de Clínicas', layout, element_justification='c')
+        
         while True:
-            print("\n=== SISTEMA DE CLÍNICAS ===")
-            print("--- Cadastros ---")
-            print("1. Pacientes")
-            print("2. Clínicas")
-            print("3. Profissionais")
-            print("4. Tipos de atendimento")
-            print("--- Registros ---")
-            print("5. Atendimentos")
-            print("6. Procedimentos")
-            print("7. Pagamentos")
-            print("--- Relatórios ---")
-            print("8. Relatórios")
-            print("0. Sair")
-            opcao = input("Escolha uma opção: ").strip()
-
-            if opcao == "1":
-                self.__tela_paciente.mostrar_menu()
-            elif opcao == "2":
-                self.__tela_clinica.mostrar_menu()
-            elif opcao == "3":
-                self.__tela_profissional.mostrar_menu()
-            elif opcao == "4":
-                self.__tela_tipo_atendimento.mostrar_menu()
-            elif opcao == "5":
-                self.__tela_atendimento.mostrar_menu()
-            elif opcao == "6":
-                self.__tela_procedimento.mostrar_menu()
-            elif opcao == "7":
-                self.__tela_pagamento.mostrar_menu()
-            elif opcao == "8":
-                self.__tela_relatorios.mostrar_menu()
-            elif opcao == "0":
-                print("Encerrando o sistema. Até logo!")
+            event, values = window.read()
+            
+            if event == sg.WIN_CLOSED or event == 'Sair':
                 break
-            else:
-                print("Opção inválida.")
+            elif event == 'Pacientes':
+                self.__tela_paciente.mostrar_menu()
+            elif event == 'Clínicas':
+                self.__tela_clinica.mostrar_menu()
+            elif event == 'Profissionais':
+                self.__tela_profissional.mostrar_menu()
+            elif event == 'Tipos de atendimento':
+                self.__tela_tipo_atendimento.mostrar_menu()
+            elif event == 'Atendimentos':
+                self.__tela_atendimento.mostrar_menu()
+            elif event == 'Procedimentos':
+                self.__tela_procedimento.mostrar_menu()
+            elif event == 'Pagamentos':
+                self.__tela_pagamento.mostrar_menu()
+            elif event == 'Relatórios':
+                self.__tela_relatorios.mostrar_menu()
+                
+        window.close()
