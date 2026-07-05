@@ -1,74 +1,113 @@
-from model.profissional import Profissional
+import FreeSimpleGUI as sg
 from datetime import date
+from Exceptions.profissionalException import ProfissionalException
 
 class TelaProfissional:
     def __init__(self, controlador_profissional):
         self.__controlador_profissional = controlador_profissional
 
     def mostrar_menu(self):
+        layout = [
+            [sg.Text('=== MENU PROFISSIONAL ===', font=('Helvetica', 14, 'bold'))],
+            [sg.Button('Cadastrar profissional', key='1', size=(25, 1))],
+            [sg.Button('Remover profissional', key='2', size=(25, 1))],
+            [sg.Button('Alterar profissional', key='3', size=(25, 1))],
+            [sg.Button('Listar profissionais', key='4', size=(25, 1))],
+            [sg.Button('Voltar', key='0', size=(10, 1), button_color=('white', 'gray'))]
+        ]
+        window = sg.Window('Menu Profissional', layout, modal=True, element_justification='c')
         while True:
-            print("\n=== MENU PROFISSIONAL ===")
-            print("1. Cadastrar profissional")
-            print("2. Remover profissional")
-            print("3. Alterar profissional")
-            print("4. Listar profissionais")
-            print("0. Voltar")
-            opcao = input("Escolha uma opção: ").strip()
-
-            if opcao == "1":
-                self.cadastrar()
-            elif opcao == "2":
-                self.remover()
-            elif opcao == "3":
-                self.alterar()
-            elif opcao == "4":
-                self.listar()
-            elif opcao == "0":
+            event, values = window.read()
+            if event == sg.WIN_CLOSED or event == '0':
                 break
-            else:
-                print("Opção inválida.")
+            elif event == '1':
+                self.cadastrar()
+            elif event == '2':
+                self.remover()
+            elif event == '3':
+                self.alterar()
+            elif event == '4':
+                self.listar()
+        window.close()
 
     def cadastrar(self):
-        try:
-            nome = input("Nome: ").strip()
-            celular = input("Celular: ").strip()
-            cpf = input("CPF (somente números): ").strip()
-            data_str = input("Data de nascimento (DD/MM/AAAA): ").strip()
-            data_nascimento = date(*reversed([int(x) for x in data_str.split("/")]))
-            especialidade = input("Especialidade: ").strip()
-            registro = input("Registro profissional: ").strip()
-            profissional = Profissional(nome, celular, cpf, data_nascimento, especialidade, registro)
-            self.__controlador_profissional.cadastrar(profissional)
-            print("Profissional cadastrado com sucesso!")
-        except ValueError as e:
-            print(f"Erro: {e}")
+        layout = [
+            [sg.Text('Nome:'), sg.InputText(key='nome')],
+            [sg.Text('Celular:'), sg.InputText(key='celular')],
+            [sg.Text('CPF (somente números):'), sg.InputText(key='cpf')],
+            [sg.Text('Data de nascimento (DD/MM/AAAA):'), sg.InputText(key='data_str')],
+            [sg.Text('Especialidade:'), sg.InputText(key='especialidade')],
+            [sg.Text('Registro profissional:'), sg.InputText(key='registro')],
+            [sg.Button('Cadastrar'), sg.Button('Cancelar', button_color=('white', 'gray'))]
+        ]
+        window = sg.Window('Cadastrar Profissional', layout, modal=True)
+        event, values = window.read()
+        
+        if event == 'Cadastrar':
+            try:
+                nome = values['nome'].strip()
+                celular = values['celular'].strip()
+                cpf = values['cpf'].strip()
+                data_str = values['data_str'].strip()
+                data_nascimento = date(*reversed([int(x) for x in data_str.split("/")]))
+                especialidade = values['especialidade'].strip()
+                registro = values['registro'].strip()
+                
+                self.__controlador_profissional.cadastrar(nome, celular, cpf, data_nascimento, especialidade, registro)
+                sg.popup('Profissional cadastrado com sucesso!', title='Sucesso')
+            except ProfissionalException as e:
+                sg.popup_error(f'Erro: {e}', title='Erro')
+            except Exception as e:
+                sg.popup_error(f'Erro: {e}', title='Erro')
+        window.close()
 
     def remover(self):
-        try:
-            cpf = input("CPF do profissional a remover: ").strip()
-            self.__controlador_profissional.remover(cpf)
-            print("Profissional removido com sucesso!")
-        except ValueError as e:
-            print(f"Erro: {e}")
+        layout = [
+            [sg.Text('CPF do profissional a remover:'), sg.InputText(key='cpf')],
+            [sg.Button('Remover', button_color=('white', 'red')), sg.Button('Cancelar', button_color=('white', 'gray'))]
+        ]
+        window = sg.Window('Remover Profissional', layout, modal=True)
+        event, values = window.read()
+        if event == 'Remover':
+            try:
+                self.__controlador_profissional.remover(values['cpf'].strip())
+                sg.popup('Profissional removido com sucesso!', title='Sucesso')
+            except ProfissionalException as e:
+                sg.popup_error(f'Erro: {e}', title='Erro')
+        window.close()
 
     def alterar(self):
-        try:
-            cpf = input("CPF do profissional a alterar: ").strip()
-            print("Deixe em branco para manter o valor atual.")
-            nome = input("Novo nome: ").strip() or None
-            celular = input("Novo celular: ").strip() or None
-            especialidade = input("Nova especialidade: ").strip() or None
-            registro = input("Novo registro profissional: ").strip() or None
-            self.__controlador_profissional.alterar(cpf, nome, celular, especialidade, registro)
-            print("Profissional alterado com sucesso!")
-        except ValueError as e:
-            print(f"Erro: {e}")
+        layout = [
+            [sg.Text('CPF do profissional a alterar:'), sg.InputText(key='cpf')],
+            [sg.Text('Novos dados (deixe em branco para manter):', font=('Helvetica', 10, 'bold'))],
+            [sg.Text('Novo nome:'), sg.InputText(key='nome')],
+            [sg.Text('Novo celular:'), sg.InputText(key='celular')],
+            [sg.Text('Nova especialidade:'), sg.InputText(key='especialidade')],
+            [sg.Text('Novo registro profissional:'), sg.InputText(key='registro')],
+            [sg.Button('Alterar'), sg.Button('Cancelar', button_color=('white', 'gray'))]
+        ]
+        window = sg.Window('Alterar Profissional', layout, modal=True)
+        event, values = window.read()
+        if event == 'Alterar':
+            try:
+                self.__controlador_profissional.alterar(
+                    values['cpf'].strip(),
+                    values['nome'].strip() or None,
+                    values['celular'].strip() or None,
+                    values['especialidade'].strip() or None,
+                    values['registro'].strip() or None
+                )
+                sg.popup('Profissional alterado com sucesso!', title='Sucesso')
+            except ProfissionalException as e:
+                sg.popup_error(f'Erro: {e}', title='Erro')
+        window.close()
 
     def listar(self):
         try:
             profissionais = self.__controlador_profissional.listar()
-            print("\n=== PROFISSIONAIS ===")
+            text = "=== PROFISSIONAIS ===\n\n"
             for i, p in enumerate(profissionais):
-                print(f"{i+1}. {p.nome} | CPF: {p.cpf} | Especialidade: {p.especialidade} | Registro: {p.registro_profissional}")
-        except ValueError as e:
-            print(f"Erro: {e}")
+                text += f"{i+1}. {p['nome']} | CPF: {p['cpf']} | Especialidade: {p['especialidade']} | Registro: {p['registro_profissional']}\n"
+            sg.popup_scrolled(text, title='Listar Profissionais', size=(60, 15))
+        except ProfissionalException as e:
+            sg.popup_error(f'Erro: {e}', title='Erro')

@@ -1,81 +1,129 @@
-from model.paciente import Paciente
+import FreeSimpleGUI as sg
 from datetime import date
+from Exceptions.pacienteException import PacienteException
 
 class TelaPaciente:
     def __init__(self, controlador_paciente):
         self.__controlador_paciente = controlador_paciente
 
     def mostrar_menu(self):
+        layout = [
+            [sg.Text('=== MENU PACIENTE ===', font=('Helvetica', 14, 'bold'))],
+            [sg.Button('Cadastrar paciente', key='1', size=(20, 1))],
+            [sg.Button('Remover paciente', key='2', size=(20, 1))],
+            [sg.Button('Alterar paciente', key='3', size=(20, 1))],
+            [sg.Button('Listar pacientes', key='4', size=(20, 1))],
+            [sg.Button('Voltar', key='0', size=(10, 1), button_color=('white', 'gray'))]
+        ]
+        window = sg.Window('Menu Paciente', layout, modal=True, element_justification='c')
         while True:
-            print("\n=== MENU PACIENTE ===")
-            print("1. Cadastrar paciente")
-            print("2. Remover paciente")
-            print("3. Alterar paciente")
-            print("4. Listar pacientes")
-            print("0. Voltar")
-            opcao = input("Escolha uma opção: ").strip()
-
-            if opcao == "1":
-                self.cadastrar()
-            elif opcao == "2":
-                self.remover()
-            elif opcao == "3":
-                self.alterar()
-            elif opcao == "4":
-                self.listar()
-            elif opcao == "0":
+            event, values = window.read()
+            if event == sg.WIN_CLOSED or event == '0':
                 break
-            else:
-                print("Opção inválida.")
+            elif event == '1':
+                self.cadastrar()
+            elif event == '2':
+                self.remover()
+            elif event == '3':
+                self.alterar()
+            elif event == '4':
+                self.listar()
+        window.close()
 
     def cadastrar(self):
-        try:
-            nome = input("Nome: ").strip()
-            celular = input("Celular: ").strip()
-            cpf = input("CPF (somente números): ").strip()
-            data_str = input("Data de nascimento (DD/MM/AAAA): ").strip()
-            data_nascimento = date(*reversed([int(x) for x in data_str.split("/")]))
+        layout = [
+            [sg.Text('Nome:'), sg.InputText(key='nome')],
+            [sg.Text('Celular:'), sg.InputText(key='celular')],
+            [sg.Text('CPF (somente números):'), sg.InputText(key='cpf')],
+            [sg.Text('Data de nascimento (DD/MM/AAAA):'), sg.InputText(key='data_str')],
+            [sg.Button('Cadastrar'), sg.Button('Cancelar', button_color=('white', 'gray'))]
+        ]
+        window = sg.Window('Cadastrar Paciente', layout, modal=True)
+        event, values = window.read()
+        
+        if event == 'Cadastrar':
+            try:
+                nome = values['nome'].strip()
+                celular = values['celular'].strip()
+                cpf = values['cpf'].strip()
+                data_str = values['data_str'].strip()
+                data_nascimento = date(*reversed([int(x) for x in data_str.split("/")]))
 
-            paciente = Paciente(nome, celular, cpf, data_nascimento)
-
-            if paciente.verificar_idade():
-                print("Paciente menor de idade. Informe o responsável.")
-                nome_resp = input("Nome do responsável: ").strip()
-                cpf_resp = input("CPF do responsável (somente números): ").strip()
-                paciente.nome_responsavel = nome_resp
-                paciente.cpf_responsavel = cpf_resp
-
-            self.__controlador_paciente.cadastrar(paciente)
-            print("Paciente cadastrado com sucesso!")
-        except ValueError as e:
-            print(f"Erro: {e}")
+                try:
+                    self.__controlador_paciente.cadastrar(nome, celular, cpf, data_nascimento)
+                    sg.popup('Paciente cadastrado com sucesso!', title='Sucesso')
+                except PacienteException as e:
+                    if "menor de idade" in str(e).lower():
+                        resp_layout = [
+                            [sg.Text('Paciente menor de idade. Informe o responsável.')],
+                            [sg.Text('Nome do responsável:'), sg.InputText(key='nome_resp')],
+                            [sg.Text('CPF do responsável:'), sg.InputText(key='cpf_resp')],
+                            [sg.Button('Confirmar'), sg.Button('Cancelar')]
+                        ]
+                        resp_window = sg.Window('Dados do Responsável', resp_layout, modal=True)
+                        r_event, r_values = resp_window.read()
+                        if r_event == 'Confirmar':
+                            self.__controlador_paciente.cadastrar(
+                                nome, celular, cpf, data_nascimento,
+                                r_values['nome_resp'].strip(), r_values['cpf_resp'].strip()
+                            )
+                            sg.popup('Paciente cadastrado com sucesso!', title='Sucesso')
+                        resp_window.close()
+                    else:
+                        raise e
+            except PacienteException as e:
+                sg.popup_error(f'Erro: {e}', title='Erro')
+            except Exception as e:
+                sg.popup_error(f'Erro: {e}', title='Erro')
+        window.close()
 
     def remover(self):
-        try:
-            cpf = input("CPF do paciente a remover: ").strip()
-            self.__controlador_paciente.remover(cpf)
-            print("Paciente removido com sucesso!")
-        except ValueError as e:
-            print(f"Erro: {e}")
+        layout = [
+            [sg.Text('CPF do paciente a remover:'), sg.InputText(key='cpf')],
+            [sg.Button('Remover', button_color=('white', 'red')), sg.Button('Cancelar', button_color=('white', 'gray'))]
+        ]
+        window = sg.Window('Remover Paciente', layout, modal=True)
+        event, values = window.read()
+        if event == 'Remover':
+            try:
+                self.__controlador_paciente.remover(values['cpf'].strip())
+                sg.popup('Paciente removido com sucesso!', title='Sucesso')
+            except PacienteException as e:
+                sg.popup_error(f'Erro: {e}', title='Erro')
+        window.close()
 
     def alterar(self):
-        try:
-            cpf = input("CPF do paciente a alterar: ").strip()
-            print("Deixe em branco para manter o valor atual.")
-            nome = input("Novo nome: ").strip() or None
-            celular = input("Novo celular: ").strip() or None
-            nome_resp = input("Novo nome do responsável: ").strip() or None
-            cpf_resp = input("Novo CPF do responsável: ").strip() or None
-            self.__controlador_paciente.alterar(cpf, nome, celular, nome_resp, cpf_resp)
-            print("Paciente alterado com sucesso!")
-        except ValueError as e:
-            print(f"Erro: {e}")
+        layout = [
+            [sg.Text('CPF do paciente a alterar:'), sg.InputText(key='cpf')],
+            [sg.Text('Novos dados (deixe em branco para manter):', font=('Helvetica', 10, 'bold'))],
+            [sg.Text('Novo nome:'), sg.InputText(key='nome')],
+            [sg.Text('Novo celular:'), sg.InputText(key='celular')],
+            [sg.Text('Novo nome do responsável:'), sg.InputText(key='nome_resp')],
+            [sg.Text('Novo CPF do responsável:'), sg.InputText(key='cpf_resp')],
+            [sg.Button('Alterar'), sg.Button('Cancelar', button_color=('white', 'gray'))]
+        ]
+        window = sg.Window('Alterar Paciente', layout, modal=True)
+        event, values = window.read()
+        if event == 'Alterar':
+            try:
+                self.__controlador_paciente.alterar(
+                    values['cpf'].strip(),
+                    values['nome'].strip() or None,
+                    values['celular'].strip() or None,
+                    values['nome_resp'].strip() or None,
+                    values['cpf_resp'].strip() or None
+                )
+                sg.popup('Paciente alterado com sucesso!', title='Sucesso')
+            except PacienteException as e:
+                sg.popup_error(f'Erro: {e}', title='Erro')
+        window.close()
 
     def listar(self):
         try:
             pacientes = self.__controlador_paciente.listar()
-            print("\n=== PACIENTES ===")
+            text = "=== PACIENTES ===\n\n"
             for i, p in enumerate(pacientes):
-                print(f"{i+1}. {p.nome} | CPF: {p.cpf} | Celular: {p.celular} | Nascimento: {p.data_nascimento}")
-        except ValueError as e:
-            print(f"Erro: {e}")
+                text += f"{i+1}. {p['nome']} | CPF: {p['cpf']} | Celular: {p['celular']} | Nascimento: {p['data_nascimento']}\n"
+            sg.popup_scrolled(text, title='Listar Pacientes', size=(60, 15))
+        except PacienteException as e:
+            sg.popup_error(f'Erro: {e}', title='Erro')
