@@ -22,15 +22,47 @@ O sistema permite:
 ## Requisitos
 
 - Python 3.8 ou superior
+- `FreeSimpleGUI` (interface gráfica)
 
-Nenhuma dependência externa é necessária. O projeto utiliza apenas a biblioteca padrão do Python.
+Para usuários de Linux (Ubuntu/Debian), é necessário instalar o pacote `python3-tk` no sistema para que a interface gráfica funcione:
+```bash
+sudo apt update
+sudo apt install -y python3-tk python3-venv
+```
 
 ---
 
-## Como executar
+## Como configurar e executar
 
-Clone o repositório e, dentro da pasta do projeto, execute:
+Siga os passos abaixo para rodar o projeto na sua máquina local de forma segura utilizando um ambiente virtual (venv):
 
+1. **Clone o repositório e acesse a pasta do projeto**:
+```bash
+git clone <URL_DO_REPOSITORIO>
+cd clinica-oop
+```
+
+2. **Crie um ambiente virtual (venv)**:
+```bash
+python3 -m venv .venv
+```
+
+3. **Ative o ambiente virtual**:
+- No Linux/macOS:
+  ```bash
+  source .venv/bin/activate
+  ```
+- No Windows:
+  ```cmd
+  .venv\Scripts\activate
+  ```
+
+4. **Instale as dependências**:
+```bash
+pip install -r requirements.txt
+```
+
+5. **Execute o sistema**:
 ```bash
 python main.py
 ```
