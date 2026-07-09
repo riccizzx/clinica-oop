@@ -5,18 +5,18 @@ class AtendimentoDAO(DAO):
     def __init__(self):
         super().__init__('atendimentos.pkl')
 
-    def add(self, atendimento: Atendimento, id_atendimento: int):
+    def add(self, key: str, atendimento: Atendimento):
         if (atendimento is not None) and isinstance(atendimento, Atendimento):
-            super().add(id_atendimento, atendimento)
+            super().add(key, atendimento)
 
-    def update(self, atendimento: Atendimento, id_atendimento: int):
+    def update(self, key: str, atendimento: Atendimento):
         if (atendimento is not None) and isinstance(atendimento, Atendimento):
-            super().update(id_atendimento, atendimento)
+            super().update(key, atendimento)
 
-    def get(self, key: int):
+    def get(self, key: str):
         return super().get(key)
 
-    def remove(self, key: int):
+    def remove(self, key: str):
         return super().remove(key)
         
     def get_all(self):

@@ -5,8 +5,15 @@ from Exceptions.pagamentoException import PagamentoException
 
 class ControladorPagamento:
     def __init__(self, controlador_atendimento):
-        self.__registros = []
         self.__controlador_atendimento = controlador_atendimento
+
+    def _obter_todos_pagamentos(self):
+        # Reconstrói a lista iterando sobre todos os atendimentos do DAO
+        registros = []
+        for atendimento in self.__controlador_atendimento.get_todos_atendimentos():
+            for pag in atendimento.pagamentos:
+                registros.append((pag, atendimento))
+        return registros
 
     def cadastrar(self, tipo, data, valor_pago, index_atendimento, cpf_pagador=None, numero_cartao=None, bandeira_cartao=None):
         atendimento = self.__controlador_atendimento.buscar(index_atendimento)
@@ -35,24 +42,37 @@ class ControladorPagamento:
             raise PagamentoException("Pagamento inválido. Verifique os dados informados.")
 
         atendimento.adicionar_pagamento(pagamento)
-        self.__registros.append((pagamento, atendimento))
+        
+        # Persiste o estado atualizado do Atendimento no arquivo
+        self.__controlador_atendimento.atualizar_atendimento(atendimento)
         return pagamento
 
     def remover(self, index):
-        if index < 0 or index >= len(self.__registros):
+        registros = self._obter_todos_pagamentos()
+        if index < 0 or index >= len(registros):
             raise PagamentoException("Pagamento não encontrado.")
-        pagamento, atendimento = self.__registros.pop(index)
+            
+        pagamento, atendimento = registros[index]
         atendimento.remover_pagamento(pagamento)
+        self.__controlador_atendimento.atualizar_atendimento(atendimento)
 
     def alterar(self, index, data=None, valor_pago=None):
-        pagamento = self.buscar(index)
+        registros = self._obter_todos_pagamentos()
+        if index < 0 or index >= len(registros):
+            raise PagamentoException("Pagamento não encontrado.")
+            
+        pagamento, atendimento = registros[index]
+        
         if data:
             pagamento.data = data
         if valor_pago is not None:
             pagamento.valor_pago = valor_pago
+            
+        self.__controlador_atendimento.atualizar_atendimento(atendimento)
 
     def listar(self):
-        if not self.__registros:
+        registros = self._obter_todos_pagamentos()
+        if not registros:
             raise PagamentoException("Nenhum pagamento registrado.")
 
         return [
@@ -61,10 +81,11 @@ class ControladorPagamento:
                 "valor_pago": p.valor_pago,
                 "tipo": type(p).__name__
             }
-            for p, _ in self.__registros
+            for p, _ in registros
         ]
 
     def buscar(self, index):
-        if index < 0 or index >= len(self.__registros):
+        registros = self._obter_todos_pagamentos()
+        if index < 0 or index >= len(registros):
             raise PagamentoException("Pagamento não encontrado.")
-        return self.__registros[index][0]
+        return registros[index][0]
