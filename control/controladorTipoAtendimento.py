@@ -1,33 +1,48 @@
 from model.tipo_atendimento import TipoAtendimento
 from Exceptions.tipoAtendimentoException import TipoAtendimentoException
+from DAOs.tipo_atendimento_dao import TipoAtendimentoDAO
 
 class ControladorTipoAtendimento:
     def __init__(self):
-        self.__tipos = []
+        self.__tipo_dao = TipoAtendimentoDAO()
 
     def cadastrar(self, nome, descricao, valor_base):
-        for t in self.__tipos:
-            if t.nome == nome:
-                raise TipoAtendimentoException(f"Já existe um tipo de atendimento com o nome '{nome}'.")
+        if self.buscar(nome) is not None:
+            raise TipoAtendimentoException(f"Já existe um tipo de atendimento com o nome '{nome}'.")
         
         tipo = TipoAtendimento(nome, descricao, valor_base)
-        self.__tipos.append(tipo)
+        self.__tipo_dao.add(tipo)
 
     def remover(self, nome):
         tipo = self.buscar(nome)
-        self.__tipos.remove(tipo)
+        if tipo is None:
+            raise TipoAtendimentoException(f"Tipo de atendimento '{nome}' não encontrado.")
+        self.__tipo_dao.remove(nome)
 
     def alterar(self, nome, novo_nome=None, descricao=None, valor_base=None):
         tipo = self.buscar(nome)
+        if tipo is None:
+            raise TipoAtendimentoException(f"Tipo de atendimento '{nome}' não encontrado.")
+        
+        mudou_chave = (novo_nome is not None and novo_nome != nome)
+        if mudou_chave:
+            self.__tipo_dao.remove(nome)
+            
         if novo_nome:
             tipo.nome = novo_nome
         if descricao:
             tipo.descricao = descricao
         if valor_base is not None:
             tipo.atualizar_valor_base(valor_base)
+            
+        if mudou_chave:
+            self.__tipo_dao.add(tipo)
+        else:
+            self.__tipo_dao.update(tipo)
 
     def listar(self):
-        if not self.__tipos:
+        tipos = self.__tipo_dao.get_all()
+        if not tipos:
             raise TipoAtendimentoException("Nenhum tipo de atendimento cadastrado.")
         
         return [
@@ -36,11 +51,8 @@ class ControladorTipoAtendimento:
                 "descricao": t.descricao,
                 "valor_base": t.valor_base
             }
-            for t in self.__tipos
+            for t in tipos
         ]
 
     def buscar(self, nome):
-        for t in self.__tipos:
-            if t.nome == nome:
-                return t
-        raise TipoAtendimentoException(f"Tipo de atendimento '{nome}' não encontrado.")
+        return self.__tipo_dao.get(nome)
