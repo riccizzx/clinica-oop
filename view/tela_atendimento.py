@@ -56,10 +56,15 @@ class TelaAtendimento:
                 valor_str = values['valor'].strip()
                 valor = float(valor_str) if valor_str else None
                 self.__controlador_atendimento.cadastrar(
-                    values['data'].strip(), values['horario_inicio'].strip(), values['horario_fim'].strip(),
-                    values['nome_clinica'].strip(), values['cidade_clinica'].strip(),
-                    values['cpf_paciente'].strip(), values['cpf_profissional'].strip(), values['nome_tipo'].strip(),
-                    valor
+                    data=values['data'].strip(),
+                    horario_inicio=values['horario_inicio'].strip(),
+                    horario_fim=values['horario_fim'].strip(),
+                    valor=valor,
+                    nome_clinica=values['nome_clinica'].strip(),
+                    cidade_clinica=values['cidade_clinica'].strip(),
+                    cpf_paciente=values['cpf_paciente'].strip(),
+                    cpf_profissional=values['cpf_profissional'].strip(),
+                    nome_tipo=values['nome_tipo'].strip()
                 )
                 sg.popup('Atendimento registrado com sucesso!', title='Sucesso')
             except AtendimentoException as e:
