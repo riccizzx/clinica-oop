@@ -1,15 +1,15 @@
 from model.paciente import Paciente
 from Exceptions.pacienteException import PacienteException
+from DAOs.paciente_dao import PacienteDAO
 from datetime import date
 
 class ControladorPaciente:
     def __init__(self):
-        self.__pacientes = []
+        self.__paciente_dao = PacienteDAO()
         
     def cadastrar(self, nome, celular, cpf, data_nascimento, nome_responsavel=None, cpf_responsavel=None):
-        for p in self.__pacientes:
-            if p.cpf == cpf:
-                raise PacienteException(f"Já existe um paciente com o CPF {cpf}.")
+        if self.buscar_por_cpf(cpf) is not None:
+            raise PacienteException(f"Já existe um paciente com o CPF {cpf}.")
         
         paciente = Paciente(nome, celular, cpf, data_nascimento)
         if not paciente.validar_cpf():
@@ -21,14 +21,19 @@ class ControladorPaciente:
             paciente.nome_responsavel = nome_responsavel
             paciente.cpf_responsavel = cpf_responsavel
             
-        self.__pacientes.append(paciente)
+        self.__paciente_dao.add(paciente)
     
     def remover(self, cpf):
         paciente = self.buscar_por_cpf(cpf)
-        self.__pacientes.remove(paciente)
+        if paciente is None:
+            raise PacienteException(f"Paciente com CPF {cpf} não encontrado.")
+        self.__paciente_dao.remove(cpf)
         
     def alterar(self, cpf, nome=None, celular=None, nome_responsavel=None, cpf_responsavel=None):
         paciente = self.buscar_por_cpf(cpf)
+        if paciente is None:
+            raise PacienteException(f"Paciente com CPF {cpf} não encontrado.")
+            
         if nome:
             paciente.nome = nome
         if celular:
@@ -37,9 +42,13 @@ class ControladorPaciente:
             paciente.nome_responsavel = nome_responsavel
         if cpf_responsavel:
             paciente.cpf_responsavel = cpf_responsavel
+            
+        # Atualiza o objeto no DAO para forçar a gravação no arquivo
+        self.__paciente_dao.update(paciente)
     
     def listar(self):
-        if not self.__pacientes:
+        pacientes = self.__paciente_dao.get_all()
+        if not pacientes:
             raise PacienteException("Nenhum paciente cadastrado.")
         
         return [
@@ -51,11 +60,8 @@ class ControladorPaciente:
                 "nome_responsavel": p.nome_responsavel,
                 "cpf_responsavel": p.cpf_responsavel
             }
-            for p in self.__pacientes
+            for p in pacientes
         ]
     
     def buscar_por_cpf(self, cpf):
-        for p in self.__pacientes:
-            if p.cpf == cpf:
-                return p
-        raise PacienteException(f"Paciente com CPF {cpf} não encontrado.")
+        return self.__paciente_dao.get(cpf)
