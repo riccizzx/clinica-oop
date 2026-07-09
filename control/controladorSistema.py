@@ -21,7 +21,7 @@ class ControladorSistema:
         # Controladores
         self.__controlador_paciente = ControladorPaciente()
         self.__controlador_profissional = ControladorProfissional()
-        self.__controlador_clinica = ControladorClinica()
+        self.__controlador_clinica = ControladorClinica(self.__controlador_profissional)
         self.__controlador_tipo_atendimento = ControladorTipoAtendimento()
         self.__controlador_atendimento = ControladorAtendimento(
             self.__controlador_paciente,

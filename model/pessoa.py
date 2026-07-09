@@ -6,35 +6,30 @@ class Pessoa(ABC):
         self.__celular = celular
         self.__cpf = cpf
 
-    # nome
     @property
-    def nome(self):
+    def nome(self) -> str:
         return self.__nome
+
+    @property
+    def celular(self) -> str:
+        return self.__celular
+
+    @property
+    def cpf(self) -> str:
+        return self.__cpf
     
     @nome.setter
     def nome(self, nome: str):
         self.__nome = nome
 
-    # celular
-    @property
-    def celular(self):
-        return self.__celular
-    
     @celular.setter
     def celular(self, celular: str):
         self.__celular = celular
-
-    # cpf
-    @property
-    def cpf(self):
-        return self.__cpf
 
     @cpf.setter
     def cpf(self, cpf: str):
         self.__cpf = cpf
 
-    # Métodos
-    
     @abstractmethod
     def validar_cpf(self) -> bool:
         pass

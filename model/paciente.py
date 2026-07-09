@@ -2,7 +2,8 @@ from datetime import date
 from model.pessoa import Pessoa
 
 class Paciente(Pessoa):
-    def __init__(self,
+    def __init__(
+        self,
         nome: str,
         celular: str,
         cpf: str,
@@ -15,41 +16,37 @@ class Paciente(Pessoa):
         self.__nome_responsavel = nome_responsavel
         self.__cpf_responsavel = cpf_responsavel
 
-    # data_nascimento
     @property
-    def data_nascimento(self):
+    def data_nascimento(self) -> date:
         return self.__data_nascimento
-    
+
+    @property
+    def nome_responsavel(self) -> str:
+        return self.__nome_responsavel
+
+    @property
+    def cpf_responsavel(self) -> str:
+        return self.__cpf_responsavel
+
     @data_nascimento.setter
     def data_nascimento(self, data_nascimento: date):
         self.__data_nascimento = data_nascimento
 
-    # nome_responsavel
-    @property
-    def nome_responsavel(self):
-        return self.__nome_responsavel
-    
     @nome_responsavel.setter
     def nome_responsavel(self, nome_responsavel: str):
         self.__nome_responsavel = nome_responsavel
-
-    # cpf_responsavel
-    @property
-    def cpf_responsavel(self):
-        return self.__cpf_responsavel
 
     @cpf_responsavel.setter
     def cpf_responsavel(self, cpf_responsavel: str):
         self.__cpf_responsavel = cpf_responsavel
 
-    # Métodos
-    
     def validar_cpf(self) -> bool:
         return len(self.cpf) == 11 and self.cpf.isdigit()
 
     def _calcular_idade(self) -> int:
         hoje = date.today()
-        idade = (
+
+        return (
             hoje.year
             - self.__data_nascimento.year
             - (
@@ -57,16 +54,15 @@ class Paciente(Pessoa):
                 < (self.__data_nascimento.month, self.__data_nascimento.day)
             )
         )
-        return idade
 
     def verificar_idade(self) -> bool:
-        # Retorna True se o paciente for MENOR de idade (menos de 18 anos completos)
         return self._calcular_idade() < 18
 
-    def verificar_resp(self) -> bool:
-        if self.verificar_idade():
-            return (
-                self.__nome_responsavel is not None
-                and self.__cpf_responsavel is not None
-            )
-        return True
+    def verificar_responsavel(self) -> bool:
+        if not self.verificar_idade():
+            return True
+
+        return (
+            self.__nome_responsavel is not None
+            and self.__cpf_responsavel is not None
+        )
