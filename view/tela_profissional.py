@@ -1,5 +1,4 @@
 import FreeSimpleGUI as sg
-from datetime import date
 from Exceptions.profissionalException import ProfissionalException
 
 class TelaProfissional:
@@ -35,7 +34,6 @@ class TelaProfissional:
             [sg.Text('Nome:'), sg.InputText(key='nome')],
             [sg.Text('Celular:'), sg.InputText(key='celular')],
             [sg.Text('CPF (somente números):'), sg.InputText(key='cpf')],
-            [sg.Text('Data de nascimento (DD/MM/AAAA):'), sg.InputText(key='data_str')],
             [sg.Text('Especialidade:'), sg.InputText(key='especialidade')],
             [sg.Text('Registro profissional:'), sg.InputText(key='registro')],
             [sg.Button('Cadastrar'), sg.Button('Cancelar', button_color=('white', 'gray'))]
@@ -48,12 +46,10 @@ class TelaProfissional:
                 nome = values['nome'].strip()
                 celular = values['celular'].strip()
                 cpf = values['cpf'].strip()
-                data_str = values['data_str'].strip()
-                data_nascimento = date(*reversed([int(x) for x in data_str.split("/")]))
                 especialidade = values['especialidade'].strip()
                 registro = values['registro'].strip()
                 
-                self.__controlador_profissional.cadastrar(nome, celular, cpf, data_nascimento, especialidade, registro)
+                self.__controlador_profissional.cadastrar(nome, celular, cpf, especialidade, registro)
                 sg.popup('Profissional cadastrado com sucesso!', title='Sucesso')
             except ProfissionalException as e:
                 sg.popup_error(f'Erro: {e}', title='Erro')

@@ -5,12 +5,12 @@ class ControladorProfissional:
     def __init__(self):
         self.__profissionais = []
 
-    def cadastrar(self, nome, celular, cpf, data_nascimento, especialidade, registro_profissional):
+    def cadastrar(self, nome, celular, cpf, especialidade, registro_profissional):
         for p in self.__profissionais:
             if p.cpf == cpf:
                 raise ProfissionalException(f"Já existe um profissional com o CPF {cpf}.")
         
-        profissional = Profissional(nome, celular, cpf, data_nascimento, especialidade, registro_profissional)
+        profissional = Profissional(nome, celular, cpf, especialidade, registro_profissional)
         
         if not profissional.validar_cpf():
             raise ProfissionalException("CPF inválido.")
@@ -43,7 +43,6 @@ class ControladorProfissional:
                 "nome": p.nome,
                 "celular": p.celular,
                 "cpf": p.cpf,
-                "data_nascimento": p.data_nascimento,
                 "especialidade": p.especialidade,
                 "registro_profissional": p.registro_profissional
             }

@@ -1,37 +1,36 @@
-
-#from abc import ABC, abstractmethod
 from model.pessoa import Pessoa
-from datetime import date
 
 class Profissional(Pessoa):
     def __init__(self,
             nome: str,
             celular: str,
             cpf: str,
-            data_nascimento : date,
             especialidade: str,
-            registro_profissional: str,):
-        
+            registro_profissional: str,
+    ):
         super().__init__(nome, celular, cpf)
-        self.__data_nascimento = data_nascimento
         self.__especialidade = especialidade
         self.__registro_profissional = registro_profissional
 
+    # especialidade
     @property
     def especialidade(self):
         return self.__especialidade
 
+    @especialidade.setter
+    def especialidade(self, especialidade: str):
+        self.__especialidade = especialidade
+    
+    # registro_profissional
     @property
     def registro_profissional(self):
         return self.__registro_profissional
 
-    @especialidade.setter
-    def especialidade(self, especialidade: str):
-        self.__especialidade = especialidade
-
     @registro_profissional.setter
     def registro_profissional(self, registro_profissional: str):
         self.__registro_profissional = registro_profissional
+    
+    # Métodos
 
     def validar_cpf(self) -> bool:
         return len(self.cpf) == 11 and self.cpf.isdigit()
