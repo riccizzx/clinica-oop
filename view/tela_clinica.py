@@ -1,5 +1,6 @@
 import FreeSimpleGUI as sg
 from Exceptions.clinicaException import ClinicaException
+from Exceptions.profissionalException import ProfissionalException
 
 class TelaClinica:
     def __init__(self, controlador_clinica):
@@ -8,10 +9,12 @@ class TelaClinica:
     def mostrar_menu(self):
         layout = [
             [sg.Text('=== MENU CLÍNICA ===', font=('Helvetica', 14, 'bold'))],
-            [sg.Button('Cadastrar clínica', key='1', size=(20, 1))],
-            [sg.Button('Remover clínica', key='2', size=(20, 1))],
-            [sg.Button('Alterar clínica', key='3', size=(20, 1))],
-            [sg.Button('Listar clínicas', key='4', size=(20, 1))],
+            [sg.Button('Cadastrar clínica', key='1', size=(25, 1))],
+            [sg.Button('Remover clínica', key='2', size=(25, 1))],
+            [sg.Button('Alterar clínica', key='3', size=(25, 1))],
+            [sg.Button('Listar clínicas', key='4', size=(25, 1))],
+            [sg.Button('Vincular profissional', key='5', size=(25, 1))],
+            [sg.Button('Desvincular profissional', key='6', size=(25, 1))],
             [sg.Button('Voltar', key='0', size=(10, 1), button_color=('white', 'gray'))]
         ]
         window = sg.Window('Menu Clínica', layout, modal=True, element_justification='c')
@@ -27,6 +30,10 @@ class TelaClinica:
                 self.alterar()
             elif event == '4':
                 self.listar()
+            elif event == '5':
+                self.vincular_profissional()
+            elif event == '6':
+                self.desvincular_profissional()
         window.close()
 
     def cadastrar(self):
@@ -101,7 +108,47 @@ class TelaClinica:
             clinicas = self.__controlador_clinica.listar()
             text = "=== CLÍNICAS ===\n\n"
             for i, c in enumerate(clinicas):
-                text += f"{i+1}. {c['nome']} | Cidade: {c['cidade']} | Funciona: {c['horario_abertura']} às {c['horario_fechamento']}\n"
-            sg.popup_scrolled(text, title='Listar Clínicas', size=(60, 15))
+                profissionais = ", ".join(c['profissionais']) if c['profissionais'] else "nenhum vinculado"
+                text += f"{i+1}. {c['nome']} | Cidade: {c['cidade']} | Funciona: {c['horario_abertura']} às {c['horario_fechamento']}\n" \
+                        f"    Profissionais vinculados: {profissionais}\n"
+            sg.popup_scrolled(text, title='Listar Clínicas', size=(70, 15))
         except ClinicaException as e:
             sg.popup_error(f'Erro: {e}', title='Erro')
+
+    def vincular_profissional(self):
+        layout = [
+            [sg.Text('Nome da clínica:'), sg.InputText(key='nome')],
+            [sg.Text('Cidade:'), sg.InputText(key='cidade')],
+            [sg.Text('CPF do profissional a vincular:'), sg.InputText(key='cpf')],
+            [sg.Button('Vincular'), sg.Button('Cancelar', button_color=('white', 'gray'))]
+        ]
+        window = sg.Window('Vincular Profissional à Clínica', layout, modal=True)
+        event, values = window.read()
+        if event == 'Vincular':
+            try:
+                self.__controlador_clinica.vincular_profissional(
+                    values['nome'].strip(), values['cidade'].strip(), values['cpf'].strip()
+                )
+                sg.popup('Profissional vinculado à clínica com sucesso!', title='Sucesso')
+            except (ClinicaException, ProfissionalException) as e:
+                sg.popup_error(f'Erro: {e}', title='Erro')
+        window.close()
+
+    def desvincular_profissional(self):
+        layout = [
+            [sg.Text('Nome da clínica:'), sg.InputText(key='nome')],
+            [sg.Text('Cidade:'), sg.InputText(key='cidade')],
+            [sg.Text('CPF do profissional a desvincular:'), sg.InputText(key='cpf')],
+            [sg.Button('Desvincular', button_color=('white', 'red')), sg.Button('Cancelar', button_color=('white', 'gray'))]
+        ]
+        window = sg.Window('Desvincular Profissional da Clínica', layout, modal=True)
+        event, values = window.read()
+        if event == 'Desvincular':
+            try:
+                self.__controlador_clinica.desvincular_profissional(
+                    values['nome'].strip(), values['cidade'].strip(), values['cpf'].strip()
+                )
+                sg.popup('Profissional desvinculado da clínica com sucesso!', title='Sucesso')
+            except (ClinicaException, ProfissionalException) as e:
+                sg.popup_error(f'Erro: {e}', title='Erro')
+        window.close()

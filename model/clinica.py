@@ -7,12 +7,19 @@ Clinica é o módulo principal do projeto, onde estão as classes e funções qu
 Com base no diagrama do model, basta escrever as classes nesta pasta model
 """
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from model.profissional import Profissional
+
 class Clinica:
     def __init__(self, nome: str, cidade: str, horario_abertura: str, horario_fechamento: str):
         self.__nome = nome
         self.__cidade = cidade
         self.__horario_abertura = horario_abertura
         self.__horario_fechamento = horario_fechamento
+        self.__profissionais: list["Profissional"] = []
 
     @property
     def nome(self):
@@ -29,6 +36,10 @@ class Clinica:
     @property
     def horario_fechamento(self):
         return self.__horario_fechamento
+
+    @property
+    def profissionais(self):
+        return list(self.__profissionais)
 
     @nome.setter
     def nome(self, nome):
@@ -55,3 +66,13 @@ class Clinica:
             and self.esta_aberta(horario_fim)
             and horario_inicio < horario_fim
         )
+
+    def adicionar_profissional(self, profissional: "Profissional"):
+        # Vincula um profissional já existente à clínica (agregação: não cria o profissional).
+        if profissional not in self.__profissionais:
+            self.__profissionais.append(profissional)
+
+    def remover_profissional(self, profissional: "Profissional"):
+        # Desvincula o profissional da clínica. O profissional em si continua existindo.
+        if profissional in self.__profissionais:
+            self.__profissionais.remove(profissional)
