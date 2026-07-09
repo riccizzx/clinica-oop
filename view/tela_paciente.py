@@ -36,11 +36,14 @@ class TelaPaciente:
             [sg.Text('Celular:'), sg.InputText(key='celular')],
             [sg.Text('CPF (somente números):'), sg.InputText(key='cpf')],
             [sg.Text('Data de nascimento (DD/MM/AAAA):'), sg.InputText(key='data_str')],
+            [sg.Text('Se o paciente for menor de idade, preencha também:', font=('Helvetica', 9, 'italic'))],
+            [sg.Text('Nome do responsável:'), sg.InputText(key='nome_resp')],
+            [sg.Text('CPF do responsável:'), sg.InputText(key='cpf_resp')],
             [sg.Button('Cadastrar'), sg.Button('Cancelar', button_color=('white', 'gray'))]
         ]
         window = sg.Window('Cadastrar Paciente', layout, modal=True)
         event, values = window.read()
-        
+
         if event == 'Cadastrar':
             try:
                 nome = values['nome'].strip()
@@ -48,29 +51,13 @@ class TelaPaciente:
                 cpf = values['cpf'].strip()
                 data_str = values['data_str'].strip()
                 data_nascimento = date(*reversed([int(x) for x in data_str.split("/")]))
+                nome_responsavel = values['nome_resp'].strip() or None
+                cpf_responsavel = values['cpf_resp'].strip() or None
 
-                try:
-                    self.__controlador_paciente.cadastrar(nome, celular, cpf, data_nascimento)
-                    sg.popup('Paciente cadastrado com sucesso!', title='Sucesso')
-                except PacienteException as e:
-                    if "menor de idade" in str(e).lower():
-                        resp_layout = [
-                            [sg.Text('Paciente menor de idade. Informe o responsável.')],
-                            [sg.Text('Nome do responsável:'), sg.InputText(key='nome_resp')],
-                            [sg.Text('CPF do responsável:'), sg.InputText(key='cpf_resp')],
-                            [sg.Button('Confirmar'), sg.Button('Cancelar')]
-                        ]
-                        resp_window = sg.Window('Dados do Responsável', resp_layout, modal=True)
-                        r_event, r_values = resp_window.read()
-                        if r_event == 'Confirmar':
-                            self.__controlador_paciente.cadastrar(
-                                nome, celular, cpf, data_nascimento,
-                                r_values['nome_resp'].strip(), r_values['cpf_resp'].strip()
-                            )
-                            sg.popup('Paciente cadastrado com sucesso!', title='Sucesso')
-                        resp_window.close()
-                    else:
-                        raise e
+                self.__controlador_paciente.cadastrar(
+                    nome, celular, cpf, data_nascimento, nome_responsavel, cpf_responsavel
+                )
+                sg.popup('Paciente cadastrado com sucesso!', title='Sucesso')
             except PacienteException as e:
                 sg.popup_error(f'Erro: {e}', title='Erro')
             except Exception as e:
