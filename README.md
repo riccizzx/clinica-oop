@@ -10,12 +10,13 @@ Curso de Sistemas de Informação - UFSC
 
 ## Sobre o sistema
 
-Sistema orientado a objetos em Python para gerenciamento de clínicas de saúde, desenvolvido seguindo o padrão arquitetural MVC (Model-View-Controller).
+Sistema orientado a objetos em Python para gerenciamento de clínicas de saúde, desenvolvido seguindo o padrão arquitetural MVC (Model-View-Controller) e utilizando o padrão DAO para persistência de dados em arquivos (`.pkl`).
 
-O sistema permite:
-- Cadastro de clínicas, pacientes, profissionais de saúde e tipos de atendimento
-- Registro de atendimentos (consultas, exames, retornos), procedimentos realizados e pagamentos
-- Emissão de relatórios gerenciais
+O sistema possui interface gráfica construída com `FreeSimpleGUI` e permite:
+- Cadastro de clínicas, pacientes, profissionais de saúde e tipos de atendimento.
+- Registro de atendimentos (consultas, exames, retornos), procedimentos realizados e pagamentos.
+- Emissão de relatórios gerenciais.
+- Salvamento automático de todos os registros e relacionamentos (Persistência em Arquivo).
 
 ---
 
@@ -24,7 +25,7 @@ O sistema permite:
 - Python 3.8 ou superior
 - `FreeSimpleGUI` (interface gráfica)
 
-Para usuários de Linux (Ubuntu/Debian), é necessário instalar o pacote `python3-tk` no sistema para que a interface gráfica funcione:
+Para usuários de Linux (Ubuntu/Debian/Mint), é necessário instalar o pacote `python3-tk` no sistema para que a interface gráfica funcione:
 ```bash
 sudo apt update
 sudo apt install -y python3-tk python3-venv
