@@ -5,7 +5,7 @@ from Exceptions.pagamentoException import PagamentoException
 
 class ControladorPagamento:
     def __init__(self, controlador_atendimento):
-        self.__pagamentos = []
+        self.__registros = []
         self.__controlador_atendimento = controlador_atendimento
 
     def cadastrar(self, tipo, data, valor_pago, index_atendimento, cpf_pagador=None, numero_cartao=None, bandeira_cartao=None):
@@ -33,13 +33,14 @@ class ControladorPagamento:
             raise PagamentoException("Pagamento inválido. Verifique os dados informados.")
 
         atendimento.adicionar_pagamento(pagamento)
-        self.__pagamentos.append(pagamento)
+        self.__registros.append((pagamento, atendimento))
         return pagamento
 
     def remover(self, index):
-        if index < 0 or index >= len(self.__pagamentos):
+        if index < 0 or index >= len(self.__registros):
             raise PagamentoException("Pagamento não encontrado.")
-        self.__pagamentos.pop(index)
+        pagamento, atendimento = self.__registros.pop(index)
+        atendimento.remover_pagamento(pagamento)
 
     def alterar(self, index, data=None, valor_pago=None):
         pagamento = self.buscar(index)
@@ -49,19 +50,19 @@ class ControladorPagamento:
             pagamento.valor_pago = valor_pago
 
     def listar(self):
-        if not self.__pagamentos:
+        if not self.__registros:
             raise PagamentoException("Nenhum pagamento registrado.")
-        
+
         return [
             {
                 "data": p.data,
                 "valor_pago": p.valor_pago,
                 "tipo": type(p).__name__
             }
-            for p in self.__pagamentos
+            for p, _ in self.__registros
         ]
 
     def buscar(self, index):
-        if index < 0 or index >= len(self.__pagamentos):
+        if index < 0 or index >= len(self.__registros):
             raise PagamentoException("Pagamento não encontrado.")
-        return self.__pagamentos[index]
+        return self.__registros[index][0]

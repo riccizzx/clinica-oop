@@ -117,6 +117,18 @@ class Atendimento:
     def adicionar_pagamento(self, pagamento: Pagamento):
         self.__pagamentos.append(pagamento)
 
+    def remover_procedimento(self, procedimento: Procedimento):
+        # Remove um procedimento da lista interna do atendimento, para que
+        # o valor total volte a refletir apenas os procedimentos ainda válidos.
+        if procedimento in self.__procedimentos:
+            self.__procedimentos.remove(procedimento)
+
+    def remover_pagamento(self, pagamento: Pagamento):
+        # Remove um pagamento da lista interna do atendimento, para que
+        # o valor restante volte a refletir apenas os pagamentos ainda válidos.
+        if pagamento in self.__pagamentos:
+            self.__pagamentos.remove(pagamento)
+
     def calcular_valor_total(self) -> float:
         custo_procedimentos = sum(p.calcular_custo() for p in self.__procedimentos)
         return self.__valor + custo_procedimentos
