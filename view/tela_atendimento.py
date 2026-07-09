@@ -12,6 +12,8 @@ class TelaAtendimento:
             [sg.Button('Remover atendimento', key='2', size=(25, 1))],
             [sg.Button('Alterar atendimento', key='3', size=(25, 1))],
             [sg.Button('Listar atendimentos', key='4', size=(25, 1))],
+            [sg.Button('Cancelar atendimento', key='5', size=(25, 1))],
+            [sg.Button('Reagendar atendimento', key='6', size=(25, 1))],
             [sg.Button('Voltar', key='0', size=(10, 1), button_color=('white', 'gray'))]
         ]
         window = sg.Window('Menu Atendimento', layout, modal=True, element_justification='c')
@@ -27,6 +29,10 @@ class TelaAtendimento:
                 self.alterar()
             elif event == '4':
                 self.listar()
+            elif event == '5':
+                self.cancelar()
+            elif event == '6':
+                self.reagendar()
         window.close()
 
     def cadastrar(self):
@@ -34,12 +40,12 @@ class TelaAtendimento:
             [sg.Text('Data do atendimento (AAAA-MM-DD):'), sg.InputText(key='data')],
             [sg.Text('Horário de início (HH:MM):'), sg.InputText(key='horario_inicio')],
             [sg.Text('Horário de fim (HH:MM):'), sg.InputText(key='horario_fim')],
-            [sg.Text('Valor (R$):'), sg.InputText(key='valor')],
             [sg.Text('Nome da clínica:'), sg.InputText(key='nome_clinica')],
             [sg.Text('Cidade da clínica:'), sg.InputText(key='cidade_clinica')],
             [sg.Text('CPF do paciente:'), sg.InputText(key='cpf_paciente')],
             [sg.Text('CPF do profissional:'), sg.InputText(key='cpf_profissional')],
             [sg.Text('Tipo de atendimento:'), sg.InputText(key='nome_tipo')],
+            [sg.Text('Valor (R$, opcional - deixe em branco para usar o valor base do tipo):'), sg.InputText(key='valor')],
             [sg.Button('Registrar'), sg.Button('Cancelar', button_color=('white', 'gray'))]
         ]
         window = sg.Window('Registrar Atendimento', layout, modal=True)
@@ -47,10 +53,13 @@ class TelaAtendimento:
         
         if event == 'Registrar':
             try:
+                valor_str = values['valor'].strip()
+                valor = float(valor_str) if valor_str else None
                 self.__controlador_atendimento.cadastrar(
-                    values['data'].strip(), values['horario_inicio'].strip(), values['horario_fim'].strip(), float(values['valor'].strip()),
+                    values['data'].strip(), values['horario_inicio'].strip(), values['horario_fim'].strip(),
                     values['nome_clinica'].strip(), values['cidade_clinica'].strip(),
-                    values['cpf_paciente'].strip(), values['cpf_profissional'].strip(), values['nome_tipo'].strip()
+                    values['cpf_paciente'].strip(), values['cpf_profissional'].strip(), values['nome_tipo'].strip(),
+                    valor
                 )
                 sg.popup('Atendimento registrado com sucesso!', title='Sucesso')
             except AtendimentoException as e:
@@ -111,10 +120,46 @@ class TelaAtendimento:
             atendimentos = self.__controlador_atendimento.listar()
             text = "=== ATENDIMENTOS ===\n\n"
             for i, a in enumerate(atendimentos):
-                text += f"{i+1}. {a['data']} | {a['horario_inicio']}-{a['horario_fim']} | " \
+                text += f"{i+1}. [{a['status'].upper()}] {a['data']} | {a['horario_inicio']}-{a['horario_fim']} | " \
                         f"{a['tipo_atendimento']} | Paciente: {a['paciente']} | " \
                         f"Profissional: {a['profissional']} | Clínica: {a['clinica']} | " \
                         f"Total: R${a['valor_total']:.2f} | Restante: R${a['valor_restante']:.2f}\n"
-            sg.popup_scrolled(text, title='Listar Atendimentos', size=(80, 20))
+            sg.popup_scrolled(text, title='Listar Atendimentos', size=(90, 20))
         except AtendimentoException as e:
             sg.popup_error(f'Erro: {e}', title='Erro')
+
+    def cancelar(self):
+        layout = [
+            [sg.Text('Número do atendimento a cancelar (índice 1-baseado):'), sg.InputText(key='index')],
+            [sg.Button('Cancelar atendimento', button_color=('white', 'red')), sg.Button('Voltar', button_color=('white', 'gray'))]
+        ]
+        window = sg.Window('Cancelar Atendimento', layout, modal=True)
+        event, values = window.read()
+        if event == 'Cancelar atendimento':
+            try:
+                index = int(values['index'].strip()) - 1
+                self.__controlador_atendimento.cancelar(index)
+                sg.popup('Atendimento cancelado com sucesso!', title='Sucesso')
+            except AtendimentoException as e:
+                sg.popup_error(f'Erro: {e}', title='Erro')
+            except ValueError:
+                sg.popup_error('Erro: Número de atendimento inválido.', title='Erro')
+        window.close()
+
+    def reagendar(self):
+        layout = [
+            [sg.Text('Número do atendimento a reagendar (índice 1-baseado):'), sg.InputText(key='index')],
+            [sg.Button('Reagendar'), sg.Button('Voltar', button_color=('white', 'gray'))]
+        ]
+        window = sg.Window('Reagendar Atendimento', layout, modal=True)
+        event, values = window.read()
+        if event == 'Reagendar':
+            try:
+                index = int(values['index'].strip()) - 1
+                self.__controlador_atendimento.reagendar(index)
+                sg.popup('Atendimento reagendado com sucesso!', title='Sucesso')
+            except AtendimentoException as e:
+                sg.popup_error(f'Erro: {e}', title='Erro')
+            except ValueError:
+                sg.popup_error('Erro: Número de atendimento inválido.', title='Erro')
+        window.close()

@@ -9,7 +9,7 @@ class ControladorAtendimento:
         self.__controlador_profissional = controlador_profissional
         self.__controlador_tipo_atendimento = controlador_tipo_atendimento
 
-    def cadastrar(self, data, horario_inicio, horario_fim, valor, nome_clinica, cidade_clinica, cpf_paciente, cpf_profissional, nome_tipo):
+    def cadastrar(self, data, horario_inicio, horario_fim, nome_clinica, cidade_clinica, cpf_paciente, cpf_profissional, nome_tipo, valor=None):
         clinica = self.__controlador_clinica.buscar(nome_clinica, cidade_clinica)
         paciente = self.__controlador_paciente.buscar_por_cpf(cpf_paciente)
         profissional = self.__controlador_profissional.buscar_por_cpf(cpf_profissional)
@@ -20,6 +20,11 @@ class ControladorAtendimento:
         if paciente.verificar_idade() and not paciente.verificar_resp():
             raise AtendimentoException("Paciente menor de idade sem responsável cadastrado.")
 
+        if valor is None:
+            valor = tipo.valor_base
+        if valor < 0:
+            raise AtendimentoException("Valor do atendimento inválido.")
+
         atendimento = Atendimento(data, horario_inicio, horario_fim, valor, clinica, paciente, profissional, tipo)
         self.__atendimentos.append(atendimento)
         return atendimento
@@ -28,6 +33,16 @@ class ControladorAtendimento:
         if index < 0 or index >= len(self.__atendimentos):
             raise AtendimentoException("Atendimento não encontrado.")
         self.__atendimentos.pop(index)
+
+    def cancelar(self, index):
+        # Cancela o atendimento (mantém o registro no histórico, mas marca como cancelado)
+        atendimento = self.buscar(index)
+        atendimento.cancelar()
+
+    def reagendar(self, index):
+        # Reativa um atendimento cancelado, voltando-o para o status "agendado"
+        atendimento = self.buscar(index)
+        atendimento.agendar()
 
     def alterar(self, index, data=None, horario_inicio=None, horario_fim=None, valor=None):
         atendimento = self.buscar(index)
@@ -53,6 +68,7 @@ class ControladorAtendimento:
                 "paciente": a.paciente.nome,
                 "profissional": a.profissional.nome,
                 "clinica": a.clinica.nome,
+                "status": a.status,
                 "valor_total": a.calcular_valor_total(),
                 "valor_restante": a.calcular_valor_restante()
             }
@@ -65,18 +81,20 @@ class ControladorAtendimento:
         return self.__atendimentos[index]
 
     def relatorio_clinicas_mais_atendimentos(self):
-        if not self.__atendimentos:
+        atendimentos_validos = [a for a in self.__atendimentos if not a.esta_cancelado()]
+        if not atendimentos_validos:
             raise AtendimentoException("Nenhum atendimento registrado.")
         contagem = {}
-        for a in self.__atendimentos:
+        for a in atendimentos_validos:
             chave = f"{a.clinica.nome} - {a.clinica.cidade}"
             contagem[chave] = contagem.get(chave, 0) + 1
         return sorted(contagem.items(), key=lambda x: x[1], reverse=True)
 
     def relatorio_atendimentos_mais_caros_baratos(self):
-        if not self.__atendimentos:
+        atendimentos_validos = [a for a in self.__atendimentos if not a.esta_cancelado()]
+        if not atendimentos_validos:
             raise AtendimentoException("Nenhum atendimento registrado.")
-        ordenados = sorted(self.__atendimentos, key=lambda a: a.calcular_valor_total(), reverse=True)
+        ordenados = sorted(atendimentos_validos, key=lambda a: a.calcular_valor_total(), reverse=True)
         # We need to return primitives/dicts here for the view
         mais_caros = [
             {"data": a.data, "paciente": a.paciente.nome, "valor_total": a.calcular_valor_total()} for a in ordenados[:3]

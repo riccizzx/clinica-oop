@@ -10,6 +10,9 @@ if TYPE_CHECKING:
     from model.tipo_atendimento import TipoAtendimento
 
 class Atendimento:
+    STATUS_AGENDADO = "agendado"
+    STATUS_CANCELADO = "cancelado"
+
     def __init__(
         self,
         data: str,
@@ -29,6 +32,7 @@ class Atendimento:
         self.__paciente = paciente
         self.__profissional = profissional
         self.__tipo_atendimento = tipo_atendimento
+        self.__status = self.STATUS_AGENDADO
         self.__procedimentos: list["Procedimento"] = []
         self.__pagamentos: list["Pagamento"] = []
 
@@ -71,6 +75,10 @@ class Atendimento:
     @property
     def pagamentos(self):
         return list(self.__pagamentos)
+
+    @property
+    def status(self):
+        return self.__status
     
     @data.setter
     def data(self, data: str):
@@ -109,7 +117,17 @@ class Atendimento:
             return self.__horario_inicio < self.__horario_fim
         except Exception:
             return False
-        
+
+    def agendar(self):
+        self.__status = self.STATUS_AGENDADO
+
+    def cancelar(self):
+        # Marca o atendimento como cancelado, sem apagar o histórico
+        self.__status = self.STATUS_CANCELADO
+
+    def esta_cancelado(self) -> bool:
+        return self.__status == self.STATUS_CANCELADO
+
     def adicionar_procedimento(self, procedimento: Procedimento):
         # Lista de procedimentos, onde cada procedimento tem um custo, e o valor do atendimento é atualizado com base no custo do procedimento e no valor base do tipo de atendimento
         self.__procedimentos.append(procedimento)

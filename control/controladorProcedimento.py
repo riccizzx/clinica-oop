@@ -10,6 +10,8 @@ class ControladorProcedimento:
     def cadastrar(self, descricao, custo, cpf_profissional, index_atendimento):
         profissional = self.__controlador_profissional.buscar_por_cpf(cpf_profissional)
         atendimento = self.__controlador_atendimento.buscar(index_atendimento)
+        if atendimento.esta_cancelado():
+            raise ProcedimentoException("Não é possível registrar procedimento em um atendimento cancelado.")
         procedimento = Procedimento(descricao, custo, profissional)
         atendimento.adicionar_procedimento(procedimento)
         self.__registros.append((procedimento, atendimento))

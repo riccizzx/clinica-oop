@@ -11,6 +11,8 @@ class ControladorPagamento:
     def cadastrar(self, tipo, data, valor_pago, index_atendimento, cpf_pagador=None, numero_cartao=None, bandeira_cartao=None):
         atendimento = self.__controlador_atendimento.buscar(index_atendimento)
 
+        if atendimento.esta_cancelado():
+            raise PagamentoException("Não é possível registrar pagamento em um atendimento cancelado.")
         if atendimento.verificar_pagamento_pendente() is False:
             raise PagamentoException("Este atendimento já está totalmente pago.")
         if data > atendimento.data:
